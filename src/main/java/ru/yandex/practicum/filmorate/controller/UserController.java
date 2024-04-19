@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +23,6 @@ public class UserController {
 
     @PostMapping
     public User create(@Valid @RequestBody User user) {
-        validate(user);
         user.setId(getNextId());
         users.put(user.getId(), user);
         log.info("Пользователь создан");
@@ -34,31 +32,9 @@ public class UserController {
     @PutMapping
     public User update(@Valid @RequestBody User user) {
         updateValidate(user);
-        validate(user);
         users.put(user.getId(), user);
         log.info("Пользователь обновлен");
         return user;
-    }
-
-    public void validate(User user) {
-        if (user.getEmail() == null || user.getEmail().isBlank()) {
-            throw new ValidationException("Email не может быть пустым");
-        }
-        if (!user.getEmail().contains("@")) {
-            throw new ValidationException("Не верный формат email");
-        }
-        if (user.getLogin() == null || user.getLogin().isBlank()) {
-            throw new ValidationException("Логин не может быть пустым");
-        }
-        if (user.getLogin().contains(" ")) {
-            throw new ValidationException("Логин не должен содержать пробелы");
-        }
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-        if (user.getBirthday() != null && user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("Дата рождения должна быть раньше текущей");
-        }
     }
 
     public void updateValidate(User user) {

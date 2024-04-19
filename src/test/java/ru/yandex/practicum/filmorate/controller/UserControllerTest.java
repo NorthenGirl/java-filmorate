@@ -1,17 +1,28 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Test;
-import ru.yandex.practicum.filmorate.exeption.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class UserControllerTest {
 
     static UserController userController = new UserController();
+    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
+    @AllArgsConstructor
+    static class ExpectedViolation {
+        String propertyPath;
+        String message;
+    }
 
     @Test
     void validateUserOk() {
@@ -21,7 +32,7 @@ class UserControllerTest {
                 "name",
                 LocalDate.of(2014, 4, 17)
         );
-        userController.validate(user);
+        validator.validate(user);
     }
 
     @Test
@@ -32,9 +43,15 @@ class UserControllerTest {
                 "name",
                 LocalDate.of(2014, 4, 17)
         );
-        Exception exception = assertThrows(ValidationException.class, () -> userController.validate(user));
+        List<ConstraintViolation<User>> violations = new ArrayList<>(validator.validate(user));
+        FilmControllerTest.ExpectedViolation expectedViolation = new FilmControllerTest.ExpectedViolation(
+                "email", "должно иметь формат адреса электронной почты");
 
-        assertEquals("Не верный формат email", exception.getMessage());
+        assertEquals(1, violations.size());
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString()
+        );
+        assertEquals(expectedViolation.message, violations.get(0).getMessage());
     }
 
     @Test
@@ -45,22 +62,15 @@ class UserControllerTest {
                 "name",
                 LocalDate.of(2014, 4, 17)
         );
-        Exception exception = assertThrows(ValidationException.class, () -> userController.validate(user));
+        List<ConstraintViolation<User>> violations = new ArrayList<>(validator.validate(user));
+        FilmControllerTest.ExpectedViolation expectedViolation = new FilmControllerTest.ExpectedViolation(
+                "email", "не должно быть пустым");
 
-        assertEquals("Email не может быть пустым", exception.getMessage());
-    }
-
-    @Test
-    void validateEmailIsBlankFail() {
-        final User user = new User(
-                " ",
-                "login",
-                "name",
-                LocalDate.of(2014, 4, 17)
+        assertEquals(1, violations.size());
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString()
         );
-        Exception exception = assertThrows(ValidationException.class, () -> userController.validate(user));
-
-        assertEquals("Email не может быть пустым", exception.getMessage());
+        assertEquals(expectedViolation.message, violations.get(0).getMessage());
     }
 
     @Test
@@ -71,23 +81,17 @@ class UserControllerTest {
                 "name",
                 LocalDate.of(2014, 4, 17)
         );
-        Exception exception = assertThrows(ValidationException.class, () -> userController.validate(user));
+        List<ConstraintViolation<User>> violations = new ArrayList<>(validator.validate(user));
+        FilmControllerTest.ExpectedViolation expectedViolation = new FilmControllerTest.ExpectedViolation(
+                "login", "не должно быть пустым");
 
-        assertEquals("Логин не может быть пустым", exception.getMessage());
-    }
-
-    @Test
-    void validateLoginIsBlankFail() {
-        final User user = new User(
-                "user@mail.ru",
-                " ",
-                "name",
-                LocalDate.of(2014, 4, 17)
+        assertEquals(1, violations.size());
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString()
         );
-        Exception exception = assertThrows(ValidationException.class, () -> userController.validate(user));
-
-        assertEquals("Логин не может быть пустым", exception.getMessage());
+        assertEquals(expectedViolation.message, violations.get(0).getMessage());
     }
+
 
     @Test
     void validateLoginContainsSpaceFail() {
@@ -97,9 +101,15 @@ class UserControllerTest {
                 "name",
                 LocalDate.of(2014, 4, 17)
         );
-        Exception exception = assertThrows(ValidationException.class, () -> userController.validate(user));
+        List<ConstraintViolation<User>> violations = new ArrayList<>(validator.validate(user));
+        FilmControllerTest.ExpectedViolation expectedViolation = new FilmControllerTest.ExpectedViolation(
+                "login", "не должен содержать пробелы");
 
-        assertEquals("Логин не должен содержать пробелы", exception.getMessage());
+        assertEquals(1, violations.size());
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString()
+        );
+        assertEquals(expectedViolation.message, violations.get(0).getMessage());
     }
 
     @Test
@@ -110,7 +120,7 @@ class UserControllerTest {
                 null,
                 LocalDate.of(2014, 4, 17)
         );
-        userController.validate(user);
+        validator.validate(user);
 
         assertEquals(user.getName(), user.getLogin());
     }
@@ -123,7 +133,7 @@ class UserControllerTest {
                 "",
                 LocalDate.of(2014, 4, 17)
         );
-        userController.validate(user);
+        validator.validate(user);
 
         assertEquals(user.getName(), user.getLogin());
     }
@@ -136,9 +146,15 @@ class UserControllerTest {
                 "name",
                 LocalDate.of(2025, 4, 17)
         );
-        Exception exception = assertThrows(ValidationException.class, () -> userController.validate(user));
+        List<ConstraintViolation<User>> violations = new ArrayList<>(validator.validate(user));
+        FilmControllerTest.ExpectedViolation expectedViolation = new FilmControllerTest.ExpectedViolation(
+                "birthday", "должно содержать прошедшую дату");
 
-        assertEquals("Дата рождения должна быть раньше текущей", exception.getMessage());
+        assertEquals(1, violations.size());
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString()
+        );
+        assertEquals(expectedViolation.message, violations.get(0).getMessage());
     }
 
     @Test
@@ -149,7 +165,7 @@ class UserControllerTest {
                 "name",
                 LocalDate.now()
         );
-        userController.validate(user);
+        validator.validate(user);
     }
 
     @Test
@@ -160,8 +176,6 @@ class UserControllerTest {
                 "name",
                 null
         );
-        userController.validate(user);
+        validator.validate(user);
     }
-
-
 }
