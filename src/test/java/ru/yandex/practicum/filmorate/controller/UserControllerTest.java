@@ -45,12 +45,6 @@ class UserControllerTest {
         );
         List<ConstraintViolation<User>> violations = new ArrayList<>(validator.validate(user));
         assertEquals(1, violations.size());
-        /*FilmControllerTest.ExpectedViolation expectedViolation = new FilmControllerTest.ExpectedViolation(
-                "email", "должно иметь формат адреса электронной почты");
-
-        assertEquals(1, violations.size());
-        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
-        assertEquals(expectedViolation.message, violations.get(0).getMessage());*/
     }
 
     @Test
@@ -63,10 +57,6 @@ class UserControllerTest {
         );
         List<ConstraintViolation<User>> violations = new ArrayList<>(validator.validate(user));
         assertEquals(1, violations.size());
-        /*FilmControllerTest.ExpectedViolation expectedViolation = new FilmControllerTest.ExpectedViolation(
-                "email", "не должно быть пустым");
-        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
-        assertEquals(expectedViolation.message, violations.get(0).getMessage());*/
     }
 
     @Test
@@ -79,11 +69,6 @@ class UserControllerTest {
         );
         List<ConstraintViolation<User>> violations = new ArrayList<>(validator.validate(user));
         assertEquals(1, violations.size());
-        /*FilmControllerTest.ExpectedViolation expectedViolation = new FilmControllerTest.ExpectedViolation(
-                "login", "не должно быть пустым");
-        assertEquals(1, violations.size());
-        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
-        assertEquals(expectedViolation.message, violations.get(0).getMessage());*/
     }
 
 
@@ -97,10 +82,6 @@ class UserControllerTest {
         );
         List<ConstraintViolation<User>> violations = new ArrayList<>(validator.validate(user));
         assertEquals(1, violations.size());
-        /*FilmControllerTest.ExpectedViolation expectedViolation = new FilmControllerTest.ExpectedViolation(
-                "login", "не должен содержать пробелы");
-        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
-        assertEquals(expectedViolation.message, violations.get(0).getMessage());*/
     }
 
     @Test
@@ -139,12 +120,6 @@ class UserControllerTest {
         );
         List<ConstraintViolation<User>> violations = new ArrayList<>(validator.validate(user));
         assertEquals(1, violations.size());
-        /*FilmControllerTest.ExpectedViolation expectedViolation = new FilmControllerTest.ExpectedViolation(
-                "birthday", "должно содержать прошедшую дату");
-
-        assertEquals(1, violations.size());
-        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
-        assertEquals(expectedViolation.message, violations.get(0).getMessage());*/
     }
 
     @Test
