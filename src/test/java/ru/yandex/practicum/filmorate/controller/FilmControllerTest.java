@@ -48,8 +48,6 @@ class FilmControllerTest {
 
         assertEquals(1, violations.size());
         assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
-        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString()
-        );
         assertEquals(expectedViolation.message, violations.get(0).getMessage());
     }
 
@@ -66,8 +64,6 @@ class FilmControllerTest {
 
         assertEquals(1, violations.size());
         assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
-        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString()
-        );
         assertEquals(expectedViolation.message, violations.get(0).getMessage());
     }
 
@@ -119,7 +115,6 @@ class FilmControllerTest {
 
         assertEquals(1, violations.size());
         assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
-        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
         assertEquals(expectedViolation.message, violations.get(0).getMessage());
     }
 
@@ -138,8 +133,6 @@ class FilmControllerTest {
 
         assertEquals(1, violations.size());
         assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
-        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString()
-        );
         assertEquals(expectedViolation.message, violations.get(0).getMessage());
     }
 
@@ -169,8 +162,6 @@ class FilmControllerTest {
 
         assertEquals(1, violations.size());
         assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
-        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString()
-        );
         assertEquals(expectedViolation.message, violations.get(0).getMessage());
     }
 }
