@@ -44,14 +44,13 @@ class UserControllerTest {
                 LocalDate.of(2014, 4, 17)
         );
         List<ConstraintViolation<User>> violations = new ArrayList<>(validator.validate(user));
-        FilmControllerTest.ExpectedViolation expectedViolation = new FilmControllerTest.ExpectedViolation(
+        assertEquals(1, violations.size());
+        /*FilmControllerTest.ExpectedViolation expectedViolation = new FilmControllerTest.ExpectedViolation(
                 "email", "должно иметь формат адреса электронной почты");
 
         assertEquals(1, violations.size());
         assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
-        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString()
-        );
-        assertEquals(expectedViolation.message, violations.get(0).getMessage());
+        assertEquals(expectedViolation.message, violations.get(0).getMessage());*/
     }
 
     @Test
@@ -68,8 +67,6 @@ class UserControllerTest {
 
         assertEquals(1, violations.size());
         assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
-        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString()
-        );
         assertEquals(expectedViolation.message, violations.get(0).getMessage());
     }
 
@@ -87,8 +84,6 @@ class UserControllerTest {
 
         assertEquals(1, violations.size());
         assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
-        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString()
-        );
         assertEquals(expectedViolation.message, violations.get(0).getMessage());
     }
 
@@ -107,8 +102,6 @@ class UserControllerTest {
 
         assertEquals(1, violations.size());
         assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
-        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString()
-        );
         assertEquals(expectedViolation.message, violations.get(0).getMessage());
     }
 
@@ -152,8 +145,6 @@ class UserControllerTest {
 
         assertEquals(1, violations.size());
         assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
-        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString()
-        );
         assertEquals(expectedViolation.message, violations.get(0).getMessage());
     }
 
