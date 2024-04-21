@@ -44,6 +44,9 @@ class UserControllerTest {
                 LocalDate.of(2014, 4, 17)
         );
         List<ConstraintViolation<User>> violations = new ArrayList<>(validator.validate(user));
+        ExpectedViolation expectedViolation = new ExpectedViolation("email", "must be a well-formed email address");
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
+        assertEquals(expectedViolation.message, violations.get(0).getMessage());
         assertEquals(1, violations.size());
     }
 
@@ -56,6 +59,9 @@ class UserControllerTest {
                 LocalDate.of(2014, 4, 17)
         );
         List<ConstraintViolation<User>> violations = new ArrayList<>(validator.validate(user));
+        ExpectedViolation expectedViolation = new ExpectedViolation("email", "must not be blank");
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
+        assertEquals(expectedViolation.message, violations.get(0).getMessage());
         assertEquals(1, violations.size());
     }
 
@@ -68,6 +74,9 @@ class UserControllerTest {
                 LocalDate.of(2014, 4, 17)
         );
         List<ConstraintViolation<User>> violations = new ArrayList<>(validator.validate(user));
+        ExpectedViolation expectedViolation = new ExpectedViolation("login", "must not be blank");
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
+        assertEquals(expectedViolation.message, violations.get(0).getMessage());
         assertEquals(1, violations.size());
     }
 
@@ -81,6 +90,9 @@ class UserControllerTest {
                 LocalDate.of(2014, 4, 17)
         );
         List<ConstraintViolation<User>> violations = new ArrayList<>(validator.validate(user));
+        ExpectedViolation expectedViolation = new ExpectedViolation("login", "must not contains spase");
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
+        assertEquals(expectedViolation.message, violations.get(0).getMessage());
         assertEquals(1, violations.size());
     }
 
@@ -119,6 +131,9 @@ class UserControllerTest {
                 LocalDate.of(2025, 4, 17)
         );
         List<ConstraintViolation<User>> violations = new ArrayList<>(validator.validate(user));
+        ExpectedViolation expectedViolation = new ExpectedViolation("birthday", "must be a past date");
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
+        assertEquals(expectedViolation.message, violations.get(0).getMessage());
         assertEquals(1, violations.size());
     }
 

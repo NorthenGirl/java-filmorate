@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = {IsAfterDateValidation.class})
 public @interface IsAfterDate {
-    String message() default "дожна быть раньше 28.12.1985";
+    String message() default "date must be after 28.12.1985";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

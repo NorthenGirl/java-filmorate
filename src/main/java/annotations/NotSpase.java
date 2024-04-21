@@ -12,7 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = {NotSpaseValidator.class})
 public @interface NotSpase {
-    String message() default "не должен содержать пробелы";
+    String message() default "must not contains spase";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 

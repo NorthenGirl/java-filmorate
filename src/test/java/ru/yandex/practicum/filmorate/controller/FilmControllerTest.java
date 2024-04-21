@@ -44,6 +44,9 @@ class FilmControllerTest {
                 60
         );
         List<ConstraintViolation<Film>> violations = new ArrayList<>(validator.validate(film));
+        ExpectedViolation expectedViolation = new ExpectedViolation("name", "must not be blank");
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
+        assertEquals(expectedViolation.message, violations.get(0).getMessage());
         assertEquals(1, violations.size());
     }
 
@@ -56,6 +59,9 @@ class FilmControllerTest {
                 60
         );
         List<ConstraintViolation<Film>> violations = new ArrayList<>(validator.validate(film));
+        ExpectedViolation expectedViolation = new ExpectedViolation("name", "must not be blank");
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
+        assertEquals(expectedViolation.message, violations.get(0).getMessage());
         assertEquals(1, violations.size());
     }
 
@@ -102,6 +108,10 @@ class FilmControllerTest {
         );
 
         List<ConstraintViolation<Film>> violations = new ArrayList<>(validator.validate(film));
+        ExpectedViolation expectedViolation = new ExpectedViolation("description",
+                "size must be between 0 and 200");
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
+        assertEquals(expectedViolation.message, violations.get(0).getMessage());
         assertEquals(1, violations.size());
     }
 
@@ -115,6 +125,10 @@ class FilmControllerTest {
         );
 
         List<ConstraintViolation<Film>> violations = new ArrayList<>(validator.validate(film));
+        ExpectedViolation expectedViolation = new ExpectedViolation("releaseDate",
+                "date must be after 28.12.1985");
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
+        assertEquals(expectedViolation.message, violations.get(0).getMessage());
         assertEquals(1, violations.size());
     }
 
@@ -139,6 +153,10 @@ class FilmControllerTest {
                 -1
         );
         List<ConstraintViolation<Film>> violations = new ArrayList<>(validator.validate(film));
+        ExpectedViolation expectedViolation = new ExpectedViolation("duration",
+                "must be greater than 0");
+        assertEquals(expectedViolation.propertyPath, violations.get(0).getPropertyPath().toString());
+        assertEquals(expectedViolation.message, violations.get(0).getMessage());
         assertEquals(1, violations.size());
     }
 }
