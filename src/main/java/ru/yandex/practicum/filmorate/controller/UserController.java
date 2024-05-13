@@ -38,7 +38,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public Set<Long> addFriend (@PathVariable Long id, @PathVariable Long friendId) {
+    public Set<Long> addFriend(@PathVariable Long id, @PathVariable Long friendId) {
        return userService.addFriend(id, friendId);
     }
 
