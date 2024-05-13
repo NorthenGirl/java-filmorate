@@ -5,7 +5,10 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -14,7 +17,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FilmControllerTest {
-    static FilmController filmController = new FilmController();
+    static FilmController filmController = new FilmController(new InMemoryFilmStorage(), new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage()));
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
