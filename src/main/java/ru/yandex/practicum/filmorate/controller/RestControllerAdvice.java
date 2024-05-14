@@ -3,17 +3,18 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.yandex.practicum.filmorate.exception.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.ErrorResponse;
 
 @Slf4j
-@RestControllerAdvice
-public class ExceptionHandler {
+@org.springframework.web.bind.annotation.RestControllerAdvice
+public class RestControllerAdvice {
 
-    @org.springframework.web.bind.annotation.ExceptionHandler
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ErrorResponse> handleNotFoundException(final NotFoundException e) {
         log.info("404 {}", e.getMessage());
@@ -22,7 +23,7 @@ public class ExceptionHandler {
                 .body(new ErrorResponse(e.getMessage()));
     }
 
-    @org.springframework.web.bind.annotation.ExceptionHandler
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleValidationException(final ValidationException e) {
         log.info("400 {}", e.getMessage());
@@ -31,12 +32,12 @@ public class ExceptionHandler {
                 .body(new ErrorResponse(e.getMessage()));
     }
 
-    /*@ResponseStatus(HttpStatus.BAD_REQUEST)
-    @org.springframework.web.bind.annotation.ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(final MethodArgumentNotValidException e) {
         log.info("400 {}", e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(e.getMessage()));
-    }*/
+    }
 }

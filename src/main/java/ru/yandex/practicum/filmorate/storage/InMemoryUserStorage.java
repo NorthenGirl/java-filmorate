@@ -34,7 +34,7 @@ public class InMemoryUserStorage implements UserStorage {
         return user;
     }
 
-    public void updateValidate(User user) {
+    private void updateValidate(User user) {
         if (user.getId() == null) {
             throw new NotFoundException("Id пользователя должен быть указан");
         }
@@ -52,6 +52,7 @@ public class InMemoryUserStorage implements UserStorage {
         return ++currentMaxId;
     }
 
+    @Override
     public Map<Long, User> getUsers() {
         return users;
     }

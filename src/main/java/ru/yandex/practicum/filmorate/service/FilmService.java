@@ -17,6 +17,13 @@ public class FilmService {
     private  final InMemoryFilmStorage filmStorage;
     private final InMemoryUserStorage userStorage;
 
+    public InMemoryFilmStorage getFilmStorage() {
+        return filmStorage;
+    }
+
+    public InMemoryUserStorage getUserStorage() {
+        return userStorage;
+    }
 
     public Set<Long> addLike(Long filmId, Long userId) {
         if (!filmStorage.getFilms().containsKey(filmId)) {

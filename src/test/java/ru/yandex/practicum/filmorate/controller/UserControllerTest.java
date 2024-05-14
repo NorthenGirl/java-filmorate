@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class UserControllerTest {
 
-    static UserController userController = new UserController(new InMemoryUserStorage(), new UserService(new InMemoryUserStorage()));
+    static UserController userController = new UserController(new UserService(new InMemoryUserStorage()));
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @AllArgsConstructor

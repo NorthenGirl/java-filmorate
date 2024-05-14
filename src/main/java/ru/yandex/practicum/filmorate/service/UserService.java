@@ -15,6 +15,10 @@ import java.util.stream.Collectors;
 public class UserService {
     private final InMemoryUserStorage userStorage;
 
+    public InMemoryUserStorage getUserStorage() {
+        return userStorage;
+    }
+
     public Set<Long> addFriend(Long userId, Long friendId) {
         if (!userStorage.getUsers().containsKey(userId)) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");

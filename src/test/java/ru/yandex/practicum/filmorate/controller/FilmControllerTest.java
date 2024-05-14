@@ -17,7 +17,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FilmControllerTest {
-    static FilmController filmController = new FilmController(new InMemoryFilmStorage(), new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage()));
+    static FilmController filmController = new FilmController(new FilmService(new InMemoryFilmStorage(), new InMemoryUserStorage()));
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
