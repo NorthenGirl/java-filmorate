@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,12 +18,16 @@ public class FilmService {
     private  final InMemoryFilmStorage filmStorage;
     private final InMemoryUserStorage userStorage;
 
-    public InMemoryFilmStorage getFilmStorage() {
-        return filmStorage;
+    public Collection<Film> findAll() {
+        return  filmStorage.findAll();
     }
 
-    public InMemoryUserStorage getUserStorage() {
-        return userStorage;
+    public Film create(Film film) {
+        return filmStorage.create(film);
+    }
+
+    public Film update(Film film) {
+        return filmStorage.update(film);
     }
 
     public Set<Long> addLike(Long filmId, Long userId) {

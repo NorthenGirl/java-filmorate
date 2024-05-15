@@ -20,19 +20,19 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> findAll() {
-        return filmService.getFilmStorage().findAll();
+        return filmService.findAll();
     }
 
     @PostMapping
     public Film create(@Valid @RequestBody Film film) {
         log.info("Новый фильм создан");
-        return filmService.getFilmStorage().create(film);
+        return filmService.create(film);
     }
 
     @PutMapping
     public Film update(@Valid @RequestBody Film film) {
         log.info("Фильм обновлен");
-        return filmService.getFilmStorage().update(film);
+        return filmService.update(film);
     }
 
     @PutMapping("/{id}/like/{userId}")
