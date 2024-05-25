@@ -51,22 +51,22 @@ erDiagram
     FRIENDSHIP_STATUS || .. |{ FRIEND: in
 ```
 ## Примеры запросов:
- Вывести список фильмов:  
- SELECT *   
- FROM FILM;  
- 
+Вывести список фильмов:  
+SELECT *
+FROM FILM;
+
 
 Вывести все фильмы с id жанра 1:  
 SELECT*  
 FROM FILM  
-WHERE genre_id = 1; 
+WHERE genre_id = 1;
 
 Вывеcти название фильмов и количество лайков для них:  
 SELECT f.description,  
 COUNT(l.like_id) AS likes_count  
 FROM LIKE AS l  
 LEFT OUTER JOIN FILM AS f ON l.film_id = f.film_id  
-GROUP BY f.description;  
+GROUP BY f.description;
 
 Вывести названия ТОП-10 самых популярных фильмов:  
 SELECT f.description,  
@@ -78,19 +78,19 @@ ORDER BY likes_count DESC
 LIMIT 10;
 
 Вывести список пользователей:  
-SELECT * 
-FROM USER;  
+SELECT *
+FROM USER;
 
 Вывести id друзей пользователя с id 1:  
 SELECT friend_id  
 FROM friend  
-WHERE user_id = 1;  
+WHERE user_id = 1;
 
 Вывести статус дружбы пользователя с id = 1 и друга с id = 2  
 SELECT fs.name AS friendship_status  
 FROM friend AS f
 LEFT OUTER JOIN friendship_status AS fs ON f.status_id = fs.status_id  
-WHERE user_id = 1 AND friend_id = 2;  
+WHERE user_id = 1 AND friend_id = 2;
 
 Вывести список пользвателей с их именами и количеством друзей, отсортиовать полученный списко по убыванию количества друзей:  
 SELECT u.name,  
