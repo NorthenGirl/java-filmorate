@@ -3,38 +3,37 @@ Template repository for Filmorate project.
 ## ER-диаграмма
 ```mermaid
 erDiagram
-    FILM{
+    FILMS{
         bigint film_id PK
+        text name
         varchar(200) description
         date releaseDate
         integer duration
-        bigint genre_id FK
         bigint rating_id FK
     }
-    LIKE {
-        bigint like_id PK
+    
+    
+    LIKES {
         bigint user_id FK
         bigint film_id FK
     }
     GENRE {
-        bigint genre_id PK
+        bigint id PK
         text name
     }
     MPA_RATING {
-        bigint rating_id PK
+        bigint id PK
         text name
     }
-    USER {
+    USERS {
         bigint user_id PK
         text email
         text login
         text name
         date birthday
-        bigint friend_Id FK
-        
     }
-    FRIEND {
-        bigint friend_Id PK
+    FRIENDS {
+        bigint friend_Id FK
         bigint user_id FK
         bigint status_id FK
         
@@ -43,12 +42,12 @@ erDiagram
         bigint status_id PK
         text name
     }
-    FILM || .. o{ LIKE: in
-    FILM || .. || MPA_RATING: in
-    LIKE || -- || USER: in
-    FILM || .. || GENRE: in
-    FRIEND }o -- |{ USER: in
-    FRIENDSHIP_STATUS || .. |{ FRIEND: in
+    FILMS || .. o{ LIKES: in
+    FILMS || .. || MPA_RATING: in
+    LIKES || -- || USERS: in
+    FILMS || .. || GENRE: in
+    FRIENDS }o -- |{ USERS: in
+    FRIENDSHIP_STATUS || .. |{ FRIENDS: in
 ```
 ## Примеры запросов:
 Вывести список фильмов:  
