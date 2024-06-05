@@ -4,8 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.DbFriendsStorage;
-import ru.yandex.practicum.filmorate.storage.DbUserStorage;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,45 +14,59 @@ import java.util.stream.Collectors;
 @Service
 @AllArgsConstructor
 public class UserService {
-    private final DbUserStorage dbUserStorage;
-    private final DbFriendsStorage friendsStorage;
+    private final InMemoryUserStorage userStorage;
 
     public Collection<User> findAll() {
-        return dbUserStorage.findAll();
+        return userStorage.findAll();
     }
 
     public User create(User user) {
-        return dbUserStorage.create(user);
+        return userStorage.create(user);
     }
 
     public User update(User user) {
-        return dbUserStorage.update(user);
+        return userStorage.update(user);
     }
 
-    public void addFriend(Long userId, Long friendId) {
-        friendsStorage.addFriend(userId, friendId);
+    public Set<Long> addFriend(Long userId, Long friendId) {
+        if (!userStorage.getUsers().containsKey(userId)) {
+            throw new NotFoundException("Пользователь с id " + userId + " не найден");
+        }
+        if (!userStorage.getUsers().containsKey(friendId)) {
+            throw new NotFoundException("Друг с id " + friendId + " не найден");
+        }
+        userStorage.getUsers().get(userId).getFriendsId().add(friendId);
+        userStorage.getUsers().get(friendId).getFriendsId().add(userId);
+        return userStorage.getUsers().get(userId).getFriendsId();
     }
 
-    public void deleteFriend(Long userId, Long friendId) {
-        friendsStorage.deleteFriend(userId, friendId);
-
+    public Set<Long> deleteFriend(Long userId, Long friendId) {
+        if (!userStorage.getUsers().containsKey(userId)) {
+            throw new NotFoundException("Пользователь с id " + userId + " не найден");
+        }
+        if (!userStorage.getUsers().containsKey(friendId)) {
+            throw new NotFoundException("Друг с id " + userId + " не найден");
+        }
+        userStorage.getUsers().get(userId).getFriendsId().remove(friendId);
+        userStorage.getUsers().get(friendId).getFriendsId().remove(userId);
+        return userStorage.getUsers().get(userId).getFriendsId();
     }
 
     public List<User> getFriends(Long userId) {
-        return friendsStorage.getIdFriends(userId)
+        if (!userStorage.getUsers().containsKey(userId)) {
+            throw new NotFoundException("Пользователь с id " + userId + " не найден");
+        }
+        return userStorage.getUsers().get(userId).getFriendsId()
                 .stream()
-                .map(id -> dbUserStorage.getUser(id))
+                .map(id -> userStorage.getUsers().get(id))
                 .collect(Collectors.toList());
     }
 
     public List<User> getCommonFriends(Long userId, Long commonId) {
-        return friendsStorage.getIdCommonFriends(userId, commonId)
+        return userStorage.getUsers().get(userId).getFriendsId()
                 .stream()
-                .map(id -> dbUserStorage.getUser(id))
+                .filter(id -> userStorage.getUsers().get(commonId).getFriendsId().contains(id))
+                .map(id -> userStorage.getUsers().get(id))
                 .collect(Collectors.toList());
-    }
-
-    public User getUser(Long id) {
-        return dbUserStorage.getUser(id);
     }
 }
