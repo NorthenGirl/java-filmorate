@@ -108,6 +108,7 @@ public class DbFilmStorageTest {
         assertThat(films.get(1)).hasFieldOrPropertyWithValue("duration", 60);
         assertThat(films.get(1)).hasFieldOrProperty("mpa");
     }
+
     @Test
     @Sql(scripts = {"/test-get-enums.sql", "/tests-get-films.sql", "/tests-get-users.sql"})
     void getIdPopularFilms() {
@@ -124,9 +125,5 @@ public class DbFilmStorageTest {
         assertEquals(1, filmStorage.getFilm(1L).getIdUserLike().size());
 
         assertEquals(2, filmStorage.getFilm(2L).getIdUserLike().size());
-
-
-
-
     }
 }
