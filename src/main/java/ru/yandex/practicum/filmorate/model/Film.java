@@ -1,11 +1,9 @@
 package ru.yandex.practicum.filmorate.model;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.springframework.validation.annotation.Validated;
 import ru.yandex.practicum.filmorate.annotations.IsAfterDate;
 
 import java.time.LocalDate;
@@ -14,10 +12,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class Film {
-    private long id;
+    private Long id;
     @NotBlank
     private String name;
     @Size(max = 200)
@@ -25,33 +26,26 @@ public class Film {
     @IsAfterDate
     private LocalDate releaseDate;
     @Positive
-    private int duration;
-    private List<Genre> genres = new ArrayList<>();
+    private Integer duration;
+    private List<Genre> genres;
+    @NonNull
     private MPA mpa;
     private Set<Long> idUserLike = new HashSet<>();
 
-   public Film(String name, String description, LocalDate releaseDate, int duration, MPA mpa) {
+    public Film(String name, String description, LocalDate releaseDate, Integer duration, @NonNull MPA mpa) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = mpa;
+        genres = new ArrayList<>();
     }
 
-    public Film(String name, String description, LocalDate releaseDate, int duration) {
+    public Film(String name, String description, LocalDate releaseDate, Integer duration) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-    }
-
-    public Film(long id, String name, String description, LocalDate releaseDate, int duration, MPA mpa) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.mpa = mpa;
     }
 }
 

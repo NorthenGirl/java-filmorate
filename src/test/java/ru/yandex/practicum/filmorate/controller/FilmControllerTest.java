@@ -5,11 +5,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Test;
-import org.springframework.jdbc.core.JdbcTemplate;
-import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.storage.DbFilmStorage;
-import ru.yandex.practicum.filmorate.storage.DbLikesStorage;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -18,9 +14,6 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class FilmControllerTest {
-    private static JdbcTemplate jdbcTemplate;
-
-    static FilmController filmController = new FilmController(new FilmService(new DbFilmStorage(jdbcTemplate), new DbLikesStorage(jdbcTemplate)));
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 

@@ -1,12 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-
 import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import org.hibernate.sql.Update;
 
 @Getter
