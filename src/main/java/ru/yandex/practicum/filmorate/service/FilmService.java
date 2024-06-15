@@ -57,6 +57,7 @@ public class FilmService {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
         likesStorage.addLike(userId, filmId);
+        filmStorage.getFilm(filmId).getIdUserLike().add(userId);
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -67,6 +68,7 @@ public class FilmService {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
         likesStorage.deleteLike(filmId, userId);
+        filmStorage.getFilm(filmId).getIdUserLike().remove(userId);
     }
 
     public List<Film> getPopularFilms(Integer count) {
