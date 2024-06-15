@@ -32,10 +32,10 @@ public class DbGenreStorage implements EnumStorage {
         return jdbcTemplate.query(sqlQuery, new DataClassRowMapper<>(Genre.class));
     }
 
-    public Genre getFromFilm(Long film_id) {
+    public Genre getFromFilm(Long filmId) {
         try {
             String sqlQuery = "SELECT * FROM genres WHERE id IN (SELECT genre_id FROM films WHERE film_id = ?)";
-            return jdbcTemplate.queryForObject(sqlQuery, new DataClassRowMapper<>(Genre.class), film_id);
+            return jdbcTemplate.queryForObject(sqlQuery, new DataClassRowMapper<>(Genre.class), filmId);
         } catch (EmptyResultDataAccessException exception) {
             return null;
         }

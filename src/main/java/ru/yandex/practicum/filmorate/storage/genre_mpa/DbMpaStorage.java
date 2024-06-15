@@ -30,8 +30,8 @@ public class DbMpaStorage implements EnumStorage {
         return jdbcTemplate.query(sqlQuery, new DataClassRowMapper<>(MPA.class));
     }
 
-    public MPA getFromFilm(Long film_id) {
+    public MPA getFromFilm(Long filmId) {
         String sqlQuery = "SELECT * FROM mpa_rating WHERE id IN (SELECT rating_id FROM films WHERE film_id = ?)";
-        return jdbcTemplate.queryForObject(sqlQuery, new DataClassRowMapper<>(MPA.class), film_id);
+        return jdbcTemplate.queryForObject(sqlQuery, new DataClassRowMapper<>(MPA.class), filmId);
     }
 }
