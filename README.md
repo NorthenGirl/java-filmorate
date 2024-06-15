@@ -42,12 +42,17 @@ erDiagram
         bigint status_id PK
         text name
     }
+    FILM_GENRES {
+        bigint film_id FK
+        bigint genre_id FK
+    }
     FILMS || .. o{ LIKES: in
     FILMS || .. || MPA_RATING: in
     LIKES || -- || USERS: in
-    FILMS || .. o{ GENRES: in
     FRIENDS }o -- |{ USERS: in
     FRIENDSHIP_STATUS || .. |{ FRIENDS: in
+    FILMS || .. |{ FILM_GENRES: in
+    FILM_GENRES }o .. o{ GENRES: in
 ```
 #
 
