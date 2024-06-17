@@ -41,12 +41,11 @@ public class DbGenreStorage implements EnumStorage {
         }
     }
 
-    public boolean genreValidate(List<Genre> genres) {
+    public void genreValidate(List<Genre> genres) {
         for (Genre genre : genres) {
             if ((jdbcTemplate.query("SELECT * FROM genres WHERE id = ?", new DataClassRowMapper<>(Genre.class), genre.getId())).isEmpty()) {
                 throw new ValidationException("Жанра с id: " + genre.getId() + " не существует");
             }
         }
-        return true;
     }
 }

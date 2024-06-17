@@ -8,11 +8,11 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
-import ru.yandex.practicum.filmorate.storage.film.DbFilmStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre_mpa.DbGenreStorage;
 import ru.yandex.practicum.filmorate.storage.genre_mpa.DbMpaStorage;
-import ru.yandex.practicum.filmorate.storage.likes.DbLikesStorage;
-import ru.yandex.practicum.filmorate.storage.user.DbUserStorage;
+import ru.yandex.practicum.filmorate.storage.likes.LikesStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -21,11 +21,11 @@ import java.util.List;
 @Slf4j
 @RequiredArgsConstructor
 public class FilmService {
-    private final DbFilmStorage filmStorage;
-    private final DbLikesStorage likesStorage;
+    private final FilmStorage filmStorage;
+    private final LikesStorage likesStorage;
     private final DbGenreStorage genreStorage;
     private final DbMpaStorage mpaStorage;
-    private final DbUserStorage userStorage;
+    private final UserStorage userStorage;
 
     public Collection<Film> findAll() {
         return filmStorage.findAll();

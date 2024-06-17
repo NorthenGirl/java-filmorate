@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.friends.DbFriendsStorage;
-import ru.yandex.practicum.filmorate.storage.user.DbUserStorage;
+import ru.yandex.practicum.filmorate.storage.friends.FriendsStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,8 +13,8 @@ import java.util.List;
 @Service
 @AllArgsConstructor
 public class UserService {
-    private final DbUserStorage userStorage;
-    private final DbFriendsStorage friendsStorage;
+    private final UserStorage userStorage;
+    private final FriendsStorage friendsStorage;
 
     public Collection<User> findAll() {
         return userStorage.findAll();

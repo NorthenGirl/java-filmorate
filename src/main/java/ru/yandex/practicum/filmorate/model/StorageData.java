@@ -11,5 +11,5 @@ import org.hibernate.sql.Update;
 @ToString
 public abstract class StorageData {
     @NotNull(groups = {Update.class})
-    long id;
+    Long id;
 }

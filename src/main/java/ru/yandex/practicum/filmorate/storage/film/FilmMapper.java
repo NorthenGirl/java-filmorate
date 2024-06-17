@@ -15,8 +15,7 @@ import java.util.Map;
 
 @Component
 public class FilmMapper implements RowMapper<Film> {
-    Map<Long, Film> films = new HashMap<>();
-
+    private Map<Long, Film> films = new HashMap<>();
 
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
         Long id = rs.getLong("film_id");
