@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Friendship;
-import ru.yandex.practicum.filmorate.storage.genre_mpa.MpaStorage;
 
 import java.util.List;
 
