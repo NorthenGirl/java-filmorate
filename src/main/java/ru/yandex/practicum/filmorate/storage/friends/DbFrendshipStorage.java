@@ -7,13 +7,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Friendship;
-import ru.yandex.practicum.filmorate.storage.genre_mpa.EnumStorage;
+import ru.yandex.practicum.filmorate.storage.genre_mpa.MpaStorage;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 @Component
-public class DbFrendshipStorage implements EnumStorage {
+public class DbFrendshipStorage implements FrendshipStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override

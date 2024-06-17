@@ -13,7 +13,7 @@ import java.util.List;
 
 @Component
 @AllArgsConstructor
-public class DbGenreStorage implements EnumStorage {
+public class DbGenreStorage implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override
@@ -32,6 +32,7 @@ public class DbGenreStorage implements EnumStorage {
         return jdbcTemplate.query(sqlQuery, new DataClassRowMapper<>(Genre.class));
     }
 
+    @Override
     public Genre getFromFilm(Long filmId) {
         try {
             String sqlQuery = "SELECT * FROM genres WHERE id IN (SELECT genre_id FROM films WHERE film_id = ?)";
@@ -41,6 +42,7 @@ public class DbGenreStorage implements EnumStorage {
         }
     }
 
+    @Override
     public void genreValidate(List<Genre> genres) {
         for (Genre genre : genres) {
             if ((jdbcTemplate.query("SELECT * FROM genres WHERE id = ?", new DataClassRowMapper<>(Genre.class), genre.getId())).isEmpty()) {

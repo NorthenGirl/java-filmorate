@@ -9,8 +9,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.genre_mpa.DbGenreStorage;
-import ru.yandex.practicum.filmorate.storage.genre_mpa.DbMpaStorage;
+import ru.yandex.practicum.filmorate.storage.genre_mpa.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.genre_mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.likes.LikesStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -23,8 +23,8 @@ import java.util.List;
 public class FilmService {
     private final FilmStorage filmStorage;
     private final LikesStorage likesStorage;
-    private final DbGenreStorage genreStorage;
-    private final DbMpaStorage mpaStorage;
+    private final GenreStorage genreStorage;
+    private final MpaStorage mpaStorage;
     private final UserStorage userStorage;
 
     public Collection<Film> findAll() {
