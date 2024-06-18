@@ -12,7 +12,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 @Component
-public class DbFrendshipStorage implements FrendshipStorage {
+public class DbFrendshipStorage implements FriendshipStorage {
     private final JdbcTemplate jdbcTemplate;
 
     @Override

@@ -13,6 +13,7 @@ import java.util.List;
 public class DbFriendsStorage implements FriendsStorage {
     private final JdbcTemplate jdbcTemplate;
 
+
     @Override
     public void addFriend(Long userId, Long friendId) {
         String sqlQuery = "INSERT INTO friends (user1_id, user2_id, status) VALUES (?, ?, ?)";
@@ -28,6 +29,7 @@ public class DbFriendsStorage implements FriendsStorage {
 
     @Override
     public List<User> getFriends(Long userId) {
+
         String sqlQuery = "SELECT * FROM users WHERE id IN (SELECT user2_id FROM friends WHERE user1_id = ? AND status = 1)";
         return jdbcTemplate.query(sqlQuery, new DataClassRowMapper<>(User.class), userId);
     }
