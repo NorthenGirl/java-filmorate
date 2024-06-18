@@ -1,16 +1,22 @@
 package ru.yandex.practicum.filmorate.model;
 
-import ru.yandex.practicum.filmorate.annotations.IsAfterDate;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
+import lombok.*;
+import ru.yandex.practicum.filmorate.annotations.IsAfterDate;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class Film {
     private Long id;
     @NotBlank
@@ -20,15 +26,26 @@ public class Film {
     @IsAfterDate
     private LocalDate releaseDate;
     @Positive
-    private int duration;
-    private Set<Long> idUserLike;
+    private Integer duration;
+    private List<Genre> genres;
+    @NonNull
+    private MPA mpa;
+    private Set<Long> idUserLike = new HashSet<>();
 
-    public Film(String name, String description, LocalDate releaseDate, int duration) {
+    public Film(String name, String description, LocalDate releaseDate, Integer duration, @NonNull MPA mpa) {
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        this.idUserLike = new HashSet<>();
+        this.mpa = mpa;
+        genres = new ArrayList<>();
+    }
+
+    public Film(String name, String description, LocalDate releaseDate, Integer duration) {
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
     }
 }
 
