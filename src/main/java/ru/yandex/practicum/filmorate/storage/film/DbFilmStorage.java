@@ -183,7 +183,7 @@ public class DbFilmStorage implements FilmStorage {
                 LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
                 LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
                 LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
-                LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l 
+                LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l
                 ON (FLM.FILM_ID = l.FILM_ID)
                 ORDER BY l.likes_count DESC
                 LIMIT ?
@@ -214,7 +214,7 @@ public class DbFilmStorage implements FilmStorage {
                 LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
                 LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
                 LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
-                LEFT JOIN (SELECT film_id, COUNT(user_id) likes_count FROM LIKES GROUP BY film_id) L 
+                LEFT JOIN (SELECT film_id, COUNT(user_id) likes_count FROM LIKES GROUP BY film_id) L
                 ON (FLM.FILM_ID = L.FILM_ID)
                 WHERE fd.director_id = ?
                 GROUP BY FLM.film_id
