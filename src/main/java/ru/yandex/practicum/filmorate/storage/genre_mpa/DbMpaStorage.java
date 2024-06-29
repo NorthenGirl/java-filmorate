@@ -5,6 +5,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.MPA;
 
 import java.util.List;
@@ -31,8 +33,16 @@ public class DbMpaStorage implements MpaStorage {
     }
 
     @Override
-    public MPA getFromFilm(Long filmId) {
-        String sqlQuery = "SELECT * FROM mpa_rating WHERE id IN (SELECT rating_id FROM films WHERE film_id = ?)";
-        return jdbcTemplate.queryForObject(sqlQuery, new DataClassRowMapper<>(MPA.class), filmId);
+    public void mpaValidateNotFound(Long mpaId) {
+        if (getById(mpaId) == null) {
+            throw new NotFoundException("Рейтинг MPA с id: " + mpaId + "  не существует");
+        }
+    }
+
+    @Override
+    public void mpaValidateBadRequest(Long mpaId) {
+        if (getById(mpaId) == null) {
+            throw new ValidationException("Рейтинг MPA с id: " + mpaId + "  не существует");
+        }
     }
 }
