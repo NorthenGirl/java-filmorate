@@ -27,10 +27,10 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private Integer duration;
-    private List<Genre> genres;
+    private List<Genre> genres = new ArrayList<>();
+    private List<Director> directors = new ArrayList<>();
     @NonNull
     private MPA mpa;
-    private Set<Long> idUserLike = new HashSet<>();
 
     public Film(String name, String description, LocalDate releaseDate, Integer duration, @NonNull MPA mpa) {
         this.name = name;
@@ -38,7 +38,6 @@ public class Film {
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.mpa = mpa;
-        genres = new ArrayList<>();
     }
 
     public Film(String name, String description, LocalDate releaseDate, Integer duration) {

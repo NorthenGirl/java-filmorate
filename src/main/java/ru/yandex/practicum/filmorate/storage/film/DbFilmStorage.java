@@ -1,13 +1,13 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
@@ -24,23 +24,31 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> findAll() {
-        String sqlQery = "SELECT\n" +
-                "    FLM.FILM_ID,\n" +
-                "    FLM.NAME,\n" +
-                "    FLM.DESCRIPTION,\n" +
-                "    FLM.RELEASEDATE,\n" +
-                "    FLM.DURATION,\n" +
-                "    L.USER_ID AS ID_USER_LIKE,\n" +
-                "    MR.ID AS RATING_ID,\n" +
-                "    MR.NAME AS RATING_NAME,\n" +
-                "    G2.ID AS GENRE_ID,\n" +
-                "    G2.NAME AS GENRE_NAME\n" +
-                "from FILMS AS FLM\n" +
-                "left join LIKES L on FLM.FILM_ID = L.FILM_ID\n" +
-                "left join MPA_RATING MR on MR.ID = FLM.RATING_ID\n" +
-                "left join FILM_GENRES FG on FLM.FILM_ID = FG.FILM_ID\n" +
-                "left join GENRES G2 on G2.ID = FG.GENRE_ID";
-        return jdbcTemplate.query(sqlQery, filmMapper::mapRow);
+        String sqlQery = """
+                SELECT
+                    FLM.FILM_ID,
+                    FLM.NAME,
+                    FLM.DESCRIPTION,
+                    FLM.RELEASEDATE,
+                    FLM.DURATION,
+                    MR.ID AS RATING_ID,
+                    MR.NAME AS RATING_NAME,
+                    G2.ID AS GENRE_ID,
+                    G2.NAME AS GENRE_NAME,
+                    D.ID AS DIRECTOR_ID,
+                    D.NAME AS DIRECTOR_NAME
+                FROM
+                    FILMS AS FLM
+                LEFT JOIN MPA_RATING MR ON MR.ID = FLM.RATING_ID
+                LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
+                LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
+                LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
+                LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
+
+                """;
+        List<Film> films = jdbcTemplate.query(sqlQery, filmMapper::mapRow);
+
+        return films;
     }
 
     @Override
@@ -58,11 +66,21 @@ public class DbFilmStorage implements FilmStorage {
             return stmt;
         }, keyHolder);
         film.setId(keyHolder.getKey().longValue());
-        if (film.getGenres() != null) {
+        if (!film.getGenres().isEmpty()) {
             List<Genre> genres = new ArrayList<>(film.getGenres());
             for (Genre genre : genres) {
                 if (genre.getId() != null) {
-                    jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id)values(?,?)", film.getId(), genre.getId());
+                    jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id)values(?,?)", +
+                            film.getId(), genre.getId());
+                }
+            }
+        }
+        if (!film.getDirectors().isEmpty()) {
+            List<Director> directors = new ArrayList<>(film.getDirectors());
+            for (Director director : directors) {
+                if (director.getId() != null) {
+                    jdbcTemplate.update("INSERT INTO film_directors (film_id, director_id) values (?, ?)", +
+                            film.getId(), director.getId());
                 }
             }
         }
@@ -72,8 +90,8 @@ public class DbFilmStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
         updateValidate(film);
-        String sqlQuery =
-                "update films SET name = ?, description = ?, releaseDate = ?, duration = ?, rating_id = ? WHERE film_id = ?";
+        String sqlQuery = "update films SET name = ?, description = ?, releaseDate = ?, duration = ?, rating_id = ?" +
+                " WHERE film_id = ?";
         jdbcTemplate.update(
                 sqlQuery,
                 film.getName(),
@@ -83,6 +101,26 @@ public class DbFilmStorage implements FilmStorage {
                 film.getMpa().getId(),
                 film.getId()
         );
+        jdbcTemplate.update("DELETE FROM film_genres WHERE film_id = ?", film.getId());
+        if (!film.getGenres().isEmpty()) {
+            List<Genre> genres = new ArrayList<>(film.getGenres());
+            for (Genre genre : genres) {
+                if (genre.getId() != null) {
+                    jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id) values(?,?)", +
+                            film.getId(), genre.getId());
+                }
+            }
+        }
+        jdbcTemplate.update("DELETE FROM film_directors WHERE film_id = ?", film.getId());
+        if (!film.getDirectors().isEmpty()) {
+            List<Director> directors = new ArrayList<>(film.getDirectors());
+            for (Director director : directors) {
+                if (director.getId() != null) {
+                    jdbcTemplate.update("INSERT INTO film_directors (film_id, director_id) values (?, ?)", film.getId(), director.getId());
+                }
+            }
+
+        }
         return film;
     }
 
@@ -93,26 +131,29 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     public Film getFilm(Long id) {
-        final String sqlQuery = "SELECT\n" +
-                "    FLM.FILM_ID,\n" +
-                "    FLM.NAME,\n" +
-                "    FLM.DESCRIPTION,\n" +
-                "    FLM.RELEASEDATE,\n" +
-                "    FLM.DURATION,\n" +
-                "    L.USER_ID AS ID_USER_LIKE,\n" +
-                "    MR.ID AS RATING_ID,\n" +
-                "    MR.NAME AS RATING_NAME,\n" +
-                "    G2.ID AS GENRE_ID,\n" +
-                "    G2.NAME AS GENRE_NAME\n" +
-                "from FILMS AS FLM\n" +
-                "left join LIKES L on FLM.FILM_ID = L.FILM_ID\n" +
-                "left join MPA_RATING MR on MR.ID = FLM.RATING_ID\n" +
-                "left join FILM_GENRES FG on FLM.FILM_ID = FG.FILM_ID\n" +
-                "left join GENRES G2 on G2.ID = FG.GENRE_ID\n" +
-                "WHERE FLM.FILM_ID = ?";
-
+        final String sqlQuery = """
+                SELECT
+                    FLM.FILM_ID,
+                    FLM.NAME,
+                    FLM.DESCRIPTION,
+                    FLM.RELEASEDATE,
+                    FLM.DURATION,
+                    MR.ID AS RATING_ID,
+                    MR.NAME AS RATING_NAME,
+                    G2.ID AS GENRE_ID,
+                    G2.NAME AS GENRE_NAME,
+                    D.ID AS DIRECTOR_ID,
+                    D.NAME AS DIRECTOR_NAME
+                FROM FILMS AS FLM
+                LEFT JOIN MPA_RATING MR ON MR.ID = FLM.RATING_ID
+                LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
+                LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
+                LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
+                LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
+                WHERE FLM.FILM_ID = ?
+                """;
         List<Film> films = jdbcTemplate.query(sqlQuery, filmMapper::mapRow, id);
-        if (films.size() == 0) {
+        if (films.isEmpty()) {
             throw new NotFoundException("Фильм с  id=" + id + "не найден");
         }
         return films.get(0);
@@ -123,16 +164,96 @@ public class DbFilmStorage implements FilmStorage {
         if (count == null) {
             count = 10;
         }
-        String sqlQuery = "SELECT f.film_id id, f.name, l.likes_count\n" +
-                "FROM FILMS f\n" +
-                " LEFT JOIN (SELECT film_id, COUNT(user_id) likes_count  FROM LIKES  GROUP BY  film_id) l " +
-                "ON (f.FILM_ID = L.FILM_ID)\n" +
-                "ORDER BY l.likes_count DESC\n" +
-                "LIMIT ?";
-        return jdbcTemplate.query(sqlQuery, new DataClassRowMapper<>(Film.class), count);
+        String sqlQuery = """
+                SELECT
+                    FLM.FILM_ID,
+                    FLM.NAME,
+                    FLM.DESCRIPTION,
+                    FLM.RELEASEDATE,
+                    FLM.DURATION,
+                    MR.ID AS RATING_ID,
+                    MR.NAME AS RATING_NAME,
+                    G2.ID AS GENRE_ID,
+                    G2.NAME AS GENRE_NAME,
+                    D.ID AS DIRECTOR_ID,
+                    D.NAME AS DIRECTOR_NAME
+                FROM FILMS AS FLM
+                LEFT JOIN MPA_RATING MR ON MR.ID = FLM.RATING_ID
+                LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
+                LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
+                LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
+                LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
+                LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l 
+                ON (FLM.FILM_ID = l.FILM_ID)
+                ORDER BY l.likes_count DESC
+                LIMIT ?
+                """;
+
+        List<Film> films = jdbcTemplate.query(sqlQuery, filmMapper::mapRow, count);
+        return films;
     }
 
-    public void updateValidate(Film film) {
+    @Override
+    public List<Film> getFilmsByDirectorIdSortedByLikes(Long directorId) {
+        String sqlQuery = """
+                SELECT
+                    FLM.FILM_ID,
+                    FLM.NAME,
+                    FLM.DESCRIPTION,
+                    FLM.RELEASEDATE,
+                    FLM.DURATION,
+                    MR.ID AS RATING_ID,
+                    MR.NAME AS RATING_NAME,
+                    G2.ID AS GENRE_ID,
+                    G2.NAME AS GENRE_NAME,
+                    D.ID AS DIRECTOR_ID,
+                    D.NAME AS DIRECTOR_NAME
+                FROM FILM_DIRECTORS fd
+                LEFT JOIN FILMS FLM ON FLM.FILM_ID = fd.FILM_ID
+                LEFT JOIN MPA_RATING MR ON MR.ID = FLM.RATING_ID
+                LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
+                LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
+                LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
+                LEFT JOIN (SELECT film_id, COUNT(user_id) likes_count FROM LIKES GROUP BY film_id) L 
+                ON (FLM.FILM_ID = L.FILM_ID)
+                WHERE fd.director_id = ?
+                GROUP BY FLM.film_id
+                ORDER BY L.likes_count DESC
+                """;
+        return jdbcTemplate.query(sqlQuery, filmMapper::mapRow, directorId);
+    }
+
+    @Override
+    public List<Film> getFilmsByDirectorIdSortedByYear(Long directorId) {
+        String sqlQuery = """
+                SELECT
+                    FLM.FILM_ID,
+                    FLM.NAME,
+                    FLM.DESCRIPTION,
+                    FLM.RELEASEDATE,
+                    FLM.DURATION,
+                    MR.ID AS RATING_ID,
+                    MR.NAME AS RATING_NAME,
+                    G2.ID AS GENRE_ID,
+                    G2.NAME AS GENRE_NAME,
+                    D.ID AS DIRECTOR_ID,
+                    D.NAME AS DIRECTOR_NAME
+                FROM FILM_DIRECTORS fd
+                LEFT JOIN FILMS FLM ON FLM.FILM_ID = fd.FILM_ID
+                LEFT JOIN MPA_RATING MR ON MR.ID = FLM.RATING_ID
+                LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
+                LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
+                LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
+                WHERE fd.director_id = ?
+                GROUP BY FLM.film_id
+                ORDER BY EXTRACT(YEAR FROM FLM.releaseDate)
+                """;
+        List<Film> films = jdbcTemplate.query(sqlQuery, filmMapper::mapRow, directorId);
+        return films;
+    }
+
+
+    private void updateValidate(Film film) {
         if (film.getId() == null) {
             throw new ValidationException("Id фильма должен быть указан");
         }
