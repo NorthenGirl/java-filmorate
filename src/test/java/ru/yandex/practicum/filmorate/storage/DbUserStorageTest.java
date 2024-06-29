@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class DbUserStorageTest {
     private final UserStorage userStorage;
 
+
     @Test
     void create() {
         userStorage.create(new User(

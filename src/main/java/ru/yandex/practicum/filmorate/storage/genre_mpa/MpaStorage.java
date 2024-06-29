@@ -9,5 +9,7 @@ public interface MpaStorage {
 
     List<MPA> getAll();
 
-    MPA getFromFilm(Long filmId);
+    void mpaValidateNotFound(Long mpaId);
+
+    void mpaValidateBadRequest(Long mpaId);
 }
