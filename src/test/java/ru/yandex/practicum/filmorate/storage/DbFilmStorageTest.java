@@ -10,10 +10,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.likes.LikesStorage;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -27,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class DbFilmStorageTest {
     private final FilmStorage filmStorage;
     private final LikesStorage likesStorage;
+    private final DirectorStorage directorStorage;
 
     @Test
     @Sql(scripts = {"/test-get-enums.sql"})
@@ -57,9 +60,9 @@ public class DbFilmStorageTest {
                 "new_description1",
                 LocalDate.of(2024, 4, 17),
                 90,
-                null,
                 new MPA(3L, "PG"),
-                null
+                new ArrayList<>(),
+                new ArrayList<>()
         ));
 
         Film film = filmStorage.getFilm(2L);

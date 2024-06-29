@@ -8,9 +8,7 @@ import ru.yandex.practicum.filmorate.annotations.IsAfterDate;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @Builder
@@ -27,10 +25,10 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private Integer duration;
-    private List<Genre> genres = new ArrayList<>();
-    private List<Director> directors = new ArrayList<>();
     @NonNull
     private MPA mpa;
+    private List<Genre> genres = new ArrayList<>();
+    private List<Director> directors = new ArrayList<>();
 
     public Film(String name, String description, LocalDate releaseDate, Integer duration, @NonNull MPA mpa) {
         this.name = name;

@@ -1,10 +1,3 @@
-drop table FILM_GENRES;
-drop table FILM_DIRECTORS;
-drop table DIRECTORS;
-drop table LIKES;
-drop table FRIENDS;
-drop table FILMS;
-drop table USERS;
 
 create table if not exists USERS
 (
