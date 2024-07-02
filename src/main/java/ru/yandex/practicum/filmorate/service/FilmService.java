@@ -102,7 +102,6 @@ public class FilmService {
         if (userStorage.getUser(userId) == null) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
-//        likesStorage.deleteLike(filmId, userId);
         likesStorage.deleteLike(userId, filmId);
     }
 

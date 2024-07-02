@@ -29,14 +29,12 @@ import java.util.List;
 public class FilmController {
     private final FilmService filmService;
 
-
     @GetMapping("/common")
     @ResponseStatus(HttpStatus.OK)
     public Collection<Film> getCommonFilms(@RequestParam("userId") @Positive Long userId,
                                            @RequestParam("friendId") @Positive Long friendId) {
         return filmService.getCommonFilms(userId, friendId);
     }
-
 
     @GetMapping
     public Collection<Film> findAll() {
