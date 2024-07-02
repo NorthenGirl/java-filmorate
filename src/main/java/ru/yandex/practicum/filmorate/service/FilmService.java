@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.service;
 
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -30,6 +32,11 @@ public class FilmService {
     private final MpaStorage mpaStorage;
     private final UserStorage userStorage;
     private final DbDirectorStorage directorStorage;
+
+    public Collection<Film> getCommonFilms(Long userId,Long friendId){
+        return filmStorage.getCommonFilms(userId,friendId);
+    }
+
 
     public Collection<Film> findAll() {
         Set<Long> ids = filmStorage.findAll().stream().map(Film::getId).collect(Collectors.toSet());
@@ -97,7 +104,8 @@ public class FilmService {
         if (userStorage.getUser(userId) == null) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
-        likesStorage.deleteLike(filmId, userId);
+//        likesStorage.deleteLike(filmId, userId);
+        likesStorage.deleteLike(userId, filmId);
     }
 
     public List<Film> getPopularFilms(Integer count) {
