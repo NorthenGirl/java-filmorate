@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -53,6 +54,12 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getPopularFilms(@RequestParam(required = false) Integer count) {
         return filmService.getPopularFilms(count);
+    }
+
+    @GetMapping("/search")
+    public List<Film> getFilmsByQuery(@RequestParam(required = false) String query,
+                                      @RequestParam(required = false) Set<String> by) {
+        return filmService.getFilmsByQuery(query, by);
     }
 
     @GetMapping("/director/{directorId}")

@@ -1,4 +1,3 @@
-
 create table if not exists USERS
 (
     id  bigint  primary key auto_increment,

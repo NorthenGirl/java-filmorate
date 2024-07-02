@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
@@ -133,5 +134,37 @@ public class FilmService {
             throw new NotFoundException("Режиссер с id " + directorId + " не найден");
         }
         return filmStorage.getFilmsByDirectorIdSortedByYear(directorId);
+    }
+
+    public List<Film> getFilmsByQuery(String query, Set<String> by) {
+        if (validationBy(by)) {
+            query = "%" + query + "%";
+            return filmStorage.getFilmsByQuery(query, by);
+        } else {
+            throw new ValidationException("Ошибка параметров запроса");
+        }
+    }
+
+    public boolean validationBy(Set<String> by) {
+        if (by == null || by.isEmpty()) {
+            throw new ValidationException("Ошибка параметров запроса");
+        }
+
+        if (by.size() < 2) {
+            if (by.contains("director") || by.contains("title")) {
+                return true;
+            } else {
+                throw new ValidationException("Ошибка параметров запроса");
+            }
+        }
+
+        if (by.size() == 2) {
+            if (by.contains("director") && by.contains("title")) {
+                return true;
+            } else {
+                throw new ValidationException("Ошибка параметров запроса");
+            }
+        }
+        throw new ValidationException("Ошибка параметров запроса");
     }
 }
