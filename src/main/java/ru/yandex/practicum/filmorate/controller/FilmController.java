@@ -32,8 +32,8 @@ public class FilmController {
 
     @GetMapping("/common")
     @ResponseStatus(HttpStatus.OK)
-    public Collection<Film> getCommonFilms(@RequestParam ("userId") @Positive Long userId,
-                                      @RequestParam("friendId") @Positive Long friendId){
+    public Collection<Film> getCommonFilms(@RequestParam("userId") @Positive Long userId,
+                                           @RequestParam("friendId") @Positive Long friendId) {
         return filmService.getCommonFilms(userId, friendId);
     }
 
@@ -62,13 +62,13 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable("userId") Long userId, @PathVariable("id") Long id) {
-        log.info("Добавлен like пользователя id={} для фильма id={}",userId, id);
+        log.info("Добавлен like пользователя id={} для фильма id={}", userId, id);
         filmService.addLike(userId, id);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
-        log.info("Удален like пользователя id={} c фильма id={}",userId, id);
+        log.info("Удален like пользователя id={} c фильма id={}", userId, id);
         filmService.deleteLike(id, userId);
     }
 

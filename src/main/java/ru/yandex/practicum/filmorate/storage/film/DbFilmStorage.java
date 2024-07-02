@@ -28,7 +28,7 @@ public class DbFilmStorage implements FilmStorage {
     public List<Film> getCommonFilms(Long userId, Long friendId) {
         throwIfUserIsAbsent(userId);
         throwIfUserIsAbsent(friendId);
-        String getCommonSortedByLikesQuery= """
+        String getCommonSortedByLikesQuery = """
                 SELECT
                   flm.film_id,
                   flm.name,
@@ -57,17 +57,17 @@ public class DbFilmStorage implements FilmStorage {
                 )
                 ORDER BY l.likes_count DESC
                 """;
-        return jdbcTemplate.query(getCommonSortedByLikesQuery, filmMapper,userId, friendId);
+        return jdbcTemplate.query(getCommonSortedByLikesQuery, filmMapper, userId, friendId);
     }
 
-    private void throwIfUserIsAbsent(Long userId){
+    private void throwIfUserIsAbsent(Long userId) {
         String userCount = """
                 SELECT COUNT(*)
                 FROM Users
                 WHERE id=?
                 """;
-        int result =jdbcTemplate.queryForObject(userCount, Integer.class, userId);
-        if(result==0){
+        int result = jdbcTemplate.queryForObject(userCount, Integer.class, userId);
+        if (result == 0) {
             throw new NotFoundException("Пользователь с  id = " + userId + " не найден");
         }
     }
