@@ -140,10 +140,10 @@ public class FilmService {
     }
 
     public List<Film> getFilmsByDirector(String query) {
-        return filmStorage.getFilmsByTitle(query);
+        return filmStorage.getFilmsByDirector(query);
     }
 
     public List<Film> getFilmsByDirectorAndTitle(String query) {
-        return filmStorage.getFilmsByTitle(query);
+        return filmStorage.getFilmsByDirectorAndTitle(query);
     }
 }
