@@ -19,7 +19,6 @@ public class UserService {
     private final FriendsStorage friendsStorage;
     private final FilmStorage filmStorage;
 
-
     public Collection<Film> getRecommendationsForUser(Long userId) {
         if (userStorage.getUser(userId) == null) {
             throw new NotFoundException("Пользователь с  id = " + userId + " не найден");
