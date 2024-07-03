@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -69,8 +70,12 @@ public class FilmController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFilm(@PathVariable Long id) {
-        filmService.deleteFilm(id);
-        log.info("Фильм с id {} удален", id);
+        if (id > 0) {
+            filmService.deleteFilm(id);
+            log.info("Фильм с id {} удален", id);
+        } else {
+            throw new NotFoundException("Фильм с id " + id + " не существует");
+        }
         return ResponseEntity.noContent().build();
     }
 
