@@ -263,94 +263,89 @@ public class DbFilmStorage implements FilmStorage {
         }
     }
 
-    public List<Film> getFilmsByQuery(String query, Set<String> by) {
-        List<Film> films = new ArrayList<Film>();
-        ;
-        if (by.contains("director") && by.contains("title")) {
-            String sqlQuery = """
-                    SELECT
-                        FLM.FILM_ID,
-                        FLM.NAME,
-                        FLM.DESCRIPTION,
-                        FLM.RELEASEDATE,
-                        FLM.DURATION,
-                        MR.ID AS RATING_ID,
-                        MR.NAME AS RATING_NAME,
-                        G2.ID AS GENRE_ID,
-                        G2.NAME AS GENRE_NAME,
-                        D.ID AS DIRECTOR_ID,
-                        D.NAME AS DIRECTOR_NAME
-                    FROM FILMS AS FLM
-                    LEFT JOIN MPA_RATING MR ON MR.ID = FLM.RATING_ID
-                    LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
-                    LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
-                    LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
-                    LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
-                    LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l
-                    ON (FLM.FILM_ID = l.FILM_ID)
-                    WHERE D.NAME LIKE ?
-                    OR FLM.NAME LIKE ?
-                    ORDER BY l.likes_count DESC
-                    """;
-            films = jdbcTemplate.query(sqlQuery, filmMapper::mapRow, query, query);
-        }
+    public List<Film> getFilmsByDirectorAndTitle(String query, Set<String> by) {
+        String sqlQuery = """
+                SELECT
+                    FLM.FILM_ID,
+                    FLM.NAME,
+                    FLM.DESCRIPTION,
+                    FLM.RELEASEDATE,
+                    FLM.DURATION,
+                    MR.ID AS RATING_ID,
+                    MR.NAME AS RATING_NAME,
+                    G2.ID AS GENRE_ID,
+                    G2.NAME AS GENRE_NAME,
+                    D.ID AS DIRECTOR_ID,
+                    D.NAME AS DIRECTOR_NAME
+                FROM FILMS AS FLM
+                LEFT JOIN MPA_RATING MR ON MR.ID = FLM.RATING_ID
+                LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
+                LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
+                LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
+                LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
+                LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l
+                ON (FLM.FILM_ID = l.FILM_ID)
+                WHERE D.NAME LIKE ?
+                OR FLM.NAME LIKE ?
+                ORDER BY l.likes_count DESC
+                """;
+        return jdbcTemplate.query(sqlQuery, filmMapper::mapRow, query, query);
+    }
 
-        if (by.size() == 1 && by.contains("director")) {
-            String sqlQuery = """
-                    SELECT
-                        FLM.FILM_ID,
-                        FLM.NAME,
-                        FLM.DESCRIPTION,
-                        FLM.RELEASEDATE,
-                        FLM.DURATION,
-                        MR.ID AS RATING_ID,
-                        MR.NAME AS RATING_NAME,
-                        G2.ID AS GENRE_ID,
-                        G2.NAME AS GENRE_NAME,
-                        D.ID AS DIRECTOR_ID,
-                        D.NAME AS DIRECTOR_NAME
-                    FROM FILMS AS FLM
-                    LEFT JOIN MPA_RATING MR ON MR.ID = FLM.RATING_ID
-                    LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
-                    LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
-                    LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
-                    LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
-                    LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l
-                    ON (FLM.FILM_ID = l.FILM_ID)
-                    WHERE D.NAME LIKE ?
-                    ORDER BY l.likes_count DESC
-                    """;
-            films = jdbcTemplate.query(sqlQuery, filmMapper::mapRow, query);
-        }
+    public List<Film> getFilmsByTitle(String query, Set<String> by) {
+        String sqlQuery = """
+                SELECT
+                    FLM.FILM_ID,
+                    FLM.NAME,
+                    FLM.DESCRIPTION,
+                    FLM.RELEASEDATE,
+                    FLM.DURATION,
+                    MR.ID AS RATING_ID,
+                    MR.NAME AS RATING_NAME,
+                    G2.ID AS GENRE_ID,
+                    G2.NAME AS GENRE_NAME,
+                    D.ID AS DIRECTOR_ID,
+                    D.NAME AS DIRECTOR_NAME
+                FROM FILMS AS FLM
+                LEFT JOIN MPA_RATING MR ON MR.ID = FLM.RATING_ID
+                LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
+                LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
+                LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
+                LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
+                LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l
+                ON (FLM.FILM_ID = l.FILM_ID)
+                WHERE FLM.NAME LIKE ?
+                ORDER BY l.likes_count DESC
+                """;
+        return jdbcTemplate.query(sqlQuery, filmMapper::mapRow, query);
+    }
 
-        if (by.size() == 1 && by.contains("title")) {
-            String sqlQuery = """
-                    SELECT
-                        FLM.FILM_ID,
-                        FLM.NAME,
-                        FLM.DESCRIPTION,
-                        FLM.RELEASEDATE,
-                        FLM.DURATION,
-                        MR.ID AS RATING_ID,
-                        MR.NAME AS RATING_NAME,
-                        G2.ID AS GENRE_ID,
-                        G2.NAME AS GENRE_NAME,
-                        D.ID AS DIRECTOR_ID,
-                        D.NAME AS DIRECTOR_NAME
-                    FROM FILMS AS FLM
-                    LEFT JOIN MPA_RATING MR ON MR.ID = FLM.RATING_ID
-                    LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
-                    LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
-                    LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
-                    LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
-                    LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l
-                    ON (FLM.FILM_ID = l.FILM_ID)
-                    WHERE FLM.NAME LIKE ?
-                    ORDER BY l.likes_count DESC
-                    """;
-            films = jdbcTemplate.query(sqlQuery, filmMapper::mapRow, query);
-        }
-        return films;
+    public List<Film> getFilmsByDirector(String query, Set<String> by) {
+        String sqlQuery = """
+                SELECT
+                    FLM.FILM_ID,
+                    FLM.NAME,
+                    FLM.DESCRIPTION,
+                    FLM.RELEASEDATE,
+                    FLM.DURATION,
+                    MR.ID AS RATING_ID,
+                    MR.NAME AS RATING_NAME,
+                    G2.ID AS GENRE_ID,
+                    G2.NAME AS GENRE_NAME,
+                    D.ID AS DIRECTOR_ID,
+                    D.NAME AS DIRECTOR_NAME
+                FROM FILMS AS FLM
+                LEFT JOIN MPA_RATING MR ON MR.ID = FLM.RATING_ID
+                LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
+                LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
+                LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
+                LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
+                LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l
+                ON (FLM.FILM_ID = l.FILM_ID)
+                WHERE D.NAME LIKE ?
+                ORDER BY l.likes_count DESC
+                """;
+        return jdbcTemplate.query(sqlQuery, filmMapper::mapRow, query);
     }
 }
 

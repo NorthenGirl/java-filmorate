@@ -137,34 +137,19 @@ public class FilmService {
     }
 
     public List<Film> getFilmsByQuery(String query, Set<String> by) {
-        if (validationBy(by)) {
-            query = "%" + query + "%";
-            return filmStorage.getFilmsByQuery(query, by);
-        } else {
-            throw new ValidationException("Ошибка параметров запроса");
-        }
-    }
-
-    public boolean validationBy(Set<String> by) {
-        if (by == null || by.isEmpty()) {
-            throw new ValidationException("Ошибка параметров запроса");
-        }
-
+        query = "%" + query + "%";
+        List<Film> films = new ArrayList<Film>();
         if (by.size() < 2) {
-            if (by.contains("director") || by.contains("title")) {
-                return true;
-            } else {
-                throw new ValidationException("Ошибка параметров запроса");
+            if (by.contains("title")) {
+                films = filmStorage.getFilmsByTitle(query, by);
+            }
+            if (by.contains("director")) {
+                films = filmStorage.getFilmsByDirector(query, by);
             }
         }
-
-        if (by.size() == 2) {
-            if (by.contains("director") && by.contains("title")) {
-                return true;
-            } else {
-                throw new ValidationException("Ошибка параметров запроса");
-            }
+        if (by.size() == 2 && by.contains("director") && by.contains("title")) {
+            films = filmStorage.getFilmsByDirectorAndTitle(query, by);
         }
-        throw new ValidationException("Ошибка параметров запроса");
+        return films;
     }
 }

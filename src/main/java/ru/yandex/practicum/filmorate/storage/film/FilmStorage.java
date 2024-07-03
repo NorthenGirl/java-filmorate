@@ -23,5 +23,9 @@ public interface FilmStorage {
 
     List<Film> getFilmsByDirectorIdSortedByYear(Long directorId);
 
-    List<Film> getFilmsByQuery(String query, Set<String> by);
+    List<Film> getFilmsByDirectorAndTitle(String query, Set<String> by);
+
+    List<Film> getFilmsByDirector(String query, Set<String> by);
+
+    List<Film> getFilmsByTitle(String query, Set<String> by);
 }
