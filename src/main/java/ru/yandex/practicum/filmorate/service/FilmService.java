@@ -35,7 +35,7 @@ public class FilmService {
         Set<Long> ids = filmStorage.findAll().stream().map(Film::getId).collect(Collectors.toSet());
         ArrayList<Film> films = new ArrayList<>();
         ids.stream()
-                .forEach(id -> films.add(filmStorage.getFilm(id)));
+            .forEach(id -> films.add(filmStorage.getFilm(id)));
         return films;
     }
 
@@ -45,12 +45,12 @@ public class FilmService {
         if (!film.getGenres().isEmpty()) {
             genreStorage.genreValidate(film.getGenres());
             film.getGenres().stream()
-                    .forEach(genre -> genre.setName(genreStorage.getById(genre.getId()).getName()));
+                .forEach(genre -> genre.setName(genreStorage.getById(genre.getId()).getName()));
         }
         if (!film.getDirectors().isEmpty()) {
             directorStorage.directorValidate(film.getDirectors());
             film.getDirectors().stream()
-                    .forEach(director -> director.setName(directorStorage.getById(director.getId()).getName()));
+                .forEach(director -> director.setName(directorStorage.getById(director.getId()).getName()));
         }
         return filmStorage.create(film);
     }
@@ -63,14 +63,14 @@ public class FilmService {
             Set<Long> ids = film.getGenres().stream().map(Genre::getId).collect(Collectors.toSet());
             ArrayList<Genre> genres = new ArrayList<>();
             ids.stream()
-                    .forEach(id -> genres.add(genreStorage.getById(id)));
+                .forEach(id -> genres.add(genreStorage.getById(id)));
             film.setGenres(genres);
         }
 
         if (!film.getDirectors().isEmpty()) {
             directorStorage.directorValidate(film.getDirectors());
             film.getDirectors().stream()
-                    .forEach(director -> director.setName(directorStorage.getById(director.getId()).getName()));
+                .forEach(director -> director.setName(directorStorage.getById(director.getId()).getName()));
         }
 
         return filmStorage.update(film);
@@ -100,8 +100,8 @@ public class FilmService {
         likesStorage.deleteLike(filmId, userId);
     }
 
-    public List<Film> getPopularFilms(Integer count) {
-        return filmStorage.getIdPopularFilms(count);
+    public List<Film> getPopularFilms(Integer count, Long genreId, Integer year) {
+        return filmStorage.getIdPopularFilms(count, genreId, year);
     }
 
     public List<Genre> getAllGenres() {
