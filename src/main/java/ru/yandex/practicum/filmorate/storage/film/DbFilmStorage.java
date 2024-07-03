@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -56,6 +57,56 @@ public class DbFilmStorage implements FilmStorage {
                 """;
         return jdbcTemplate.query(getRecommendedFilmsQuery, filmMapper, userId, userId, userId);
     }
+
+    @Override
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        throwIfUserIsAbsent(userId);
+        throwIfUserIsAbsent(friendId);
+        String getCommonSortedByLikesQuery = """
+                SELECT
+                  flm.film_id,
+                  flm.name,
+                  flm.description,
+                  flm.releasedate,
+                  flm.duration,
+                  mr.id AS rating_id,
+                  mr.name AS rating_name,
+                  g2.id AS genre_id,
+                  g2.name AS genre_name,
+                  d.id AS director_id,
+                  d.name AS director_name
+                FROM films AS flm
+                  LEFT JOIN mpa_rating mr ON mr.id = flm.rating_id
+                  LEFT JOIN film_genres fg ON flm.film_id = fg.film_id
+                  LEFT JOIN genres g2 ON g2.id = fg.genre_id
+                  LEFT JOIN film_directors fd ON flm.film_id = fd.film_id
+                  LEFT JOIN directors d ON d.id = fd.director_id
+                  LEFT JOIN (
+                	 SELECT film_id, COUNT(user_id) as likes_count FROM likes GROUP BY film_id) l
+                	 ON (flm.film_id = l.film_id)
+                WHERE flm.film_id IN (
+                	 SELECT likes.film_id FROM likes WHERE likes.user_id=?
+                	 INTERSECT
+                	 SELECT likes.film_id FROM likes WHERE likes.user_id=?
+                )
+                ORDER BY l.likes_count DESC
+                """;
+        return jdbcTemplate.query(getCommonSortedByLikesQuery, filmMapper, userId, friendId);
+    }
+
+    private void throwIfUserIsAbsent(Long userId) {
+        String userCount = """
+                SELECT COUNT(*)
+                FROM Users
+                WHERE id=?
+                """;
+        int result = jdbcTemplate.queryForObject(userCount, Integer.class, userId);
+        if (result == 0) {
+            throw new NotFoundException("Пользователь с  id = " + userId + " не найден");
+        }
+    }
+
 
     @Override
     public List<Film> findAll() {
