@@ -1,8 +1,10 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
@@ -15,6 +17,7 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/films")
+@Validated
 public class FilmController {
     private final FilmService filmService;
 
@@ -51,9 +54,10 @@ public class FilmController {
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(required = false) Integer count,
-                                      @RequestParam(value = "genreId", required = false) Long genreId,
-                                      @RequestParam(value = "year", required = false) Integer year) {
+    public List<Film> getPopularFilms(
+        @RequestParam(value = "count", required = false, defaultValue = "10") @Min(1) Integer count,
+        @RequestParam(value = "genreId", required = false) Long genreId,
+        @RequestParam(value = "year", required = false) @Min(1895) Integer year) {
         return filmService.getPopularFilms(count, genreId, year);
     }
 
