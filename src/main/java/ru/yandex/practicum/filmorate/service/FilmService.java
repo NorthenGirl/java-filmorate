@@ -31,6 +31,11 @@ public class FilmService {
     private final UserStorage userStorage;
     private final DbDirectorStorage directorStorage;
 
+    public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
+
+
     public Collection<Film> findAll() {
         Set<Long> ids = filmStorage.findAll().stream().map(Film::getId).collect(Collectors.toSet());
         ArrayList<Film> films = new ArrayList<>();
@@ -97,7 +102,7 @@ public class FilmService {
         if (userStorage.getUser(userId) == null) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
-        likesStorage.deleteLike(userId,filmId);
+        likesStorage.deleteLike(userId, filmId);
     }
 
     public List<Film> getPopularFilms(Integer count) {
