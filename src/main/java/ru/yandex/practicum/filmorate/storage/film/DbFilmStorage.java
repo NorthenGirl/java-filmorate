@@ -198,7 +198,7 @@ public class DbFilmStorage implements FilmStorage {
                     AND EXTRACT(YEAR FROM FLM.RELEASEDATE) = ?\s""");
             params.add(year);
         }
-        sqlQuery.append("""        
+        sqlQuery.append("""      
                 ORDER BY l.likes_count DESC
                 LIMIT ?
                 """);
