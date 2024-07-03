@@ -1,3 +1,15 @@
+DROP TABLE IF EXISTS USERS CASCADE;
+DROP TABLE IF EXISTS FRIENDSHIP_STATUS CASCADE;
+DROP TABLE IF EXISTS FRIENDS CASCADE;
+DROP TABLE IF EXISTS GENRES CASCADE;
+DROP TABLE IF EXISTS MPA_RATING CASCADE;
+DROP TABLE IF EXISTS DIRECTORS CASCADE;
+DROP TABLE IF EXISTS FILMS CASCADE;
+DROP TABLE IF EXISTS LIKES CASCADE;
+DROP TABLE IF EXISTS FILM_GENRES CASCADE;
+DROP TABLE IF EXISTS FILM_DIRECTORS CASCADE;
+DROP TABLE IF EXISTS REVIEWS CASCADE;
+DROP TABLE IF EXISTS REVIEW_RATING CASCADE;
 
 create table if not exists USERS
 (
@@ -67,6 +79,23 @@ create table if not exists FILM_DIRECTORS
     director_id bigint references DIRECTORS (id) ON DELETE CASCADE
     );
 
+create table if not exists REVIEWS
+(
+    id bigint primary key auto_increment,
+    content text not null,
+    is_positive bool,
+    user_id bigint references USERS (id) ON DELETE CASCADE,
+    film_id bigint references FILMS (film_id) ON DELETE CASCADE,
+    useful bigint
+);
+
+create table if not exists REVIEW_RATING
+(
+    review_id bigint references REVIEWS (id) ON DELETE CASCADE,
+    user_id bigint references USERS (id) ON DELETE CASCADE,
+    is_positive bool,
+    primary key (review_id, user_id)
+);
 
 
 
