@@ -10,4 +10,6 @@ public interface GenreStorage {
     List<Genre> getAll();
 
     void genreValidate(List<Genre> genres);
+
+    void deleteGenreByFilmId(Long id);
 }

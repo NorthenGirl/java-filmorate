@@ -31,4 +31,10 @@ public class DbLikesStorage implements LikesStorage {
             throw new ValidationException("Пользователь с id = " + userId + " уже лайкнул этот фильм");
         }
     }
+
+    @Override
+    public void deleteLikesByFilmId(Long filmId) {
+        String sqlQuery = "DELETE FROM likes WHERE film_id = ?";
+        jdbcTemplate.update(sqlQuery, filmId);
+    }
 }

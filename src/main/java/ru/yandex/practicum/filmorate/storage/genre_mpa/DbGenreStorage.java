@@ -40,4 +40,9 @@ public class DbGenreStorage implements GenreStorage {
             }
         }
     }
+
+    @Override
+    public void deleteGenreByFilmId(Long id) {
+        jdbcTemplate.update("DELETE FROM FILM_GENRES WHERE film_id = ?", id);
+    }
 }
