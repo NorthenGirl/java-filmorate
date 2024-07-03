@@ -7,10 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class FilmServiceTest {
@@ -23,9 +20,9 @@ class FilmServiceTest {
     @Test
     @DisplayName("test common film")
     void getCommonFilms() {
-        Long userId= 12L;
-        Long friendId=18L;
-        filmService.getCommonFilms(userId,friendId);
-        Mockito.verify(filmStorage).getCommonFilms(userId,friendId);
+        Long userId = 12L;
+        Long friendId = 18L;
+        filmService.getCommonFilms(userId, friendId);
+        Mockito.verify(filmStorage).getCommonFilms(userId, friendId);
     }
 }
