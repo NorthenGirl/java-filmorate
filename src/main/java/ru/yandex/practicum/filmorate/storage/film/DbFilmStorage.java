@@ -25,7 +25,6 @@ public class DbFilmStorage implements FilmStorage {
     private final FilmMapper filmMapper;
 
     @Override
-    @Transactional
     public List<Film> getRecommendationsForUser(Long userId) {
         String getRecommendedFilmsQuery = """
                 SELECT likes.film_id,
