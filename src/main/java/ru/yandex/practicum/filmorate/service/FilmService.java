@@ -135,20 +135,15 @@ public class FilmService {
         return filmStorage.getFilmsByDirectorIdSortedByYear(directorId);
     }
 
-    public List<Film> getFilmsByQuery(String query, Set<String> by) {
-        query = "%" + query + "%";
-        List<Film> films = new ArrayList<Film>();
-        if (by.size() < 2) {
-            if (by.contains("title")) {
-                films = filmStorage.getFilmsByTitle(query, by);
-            }
-            if (by.contains("director")) {
-                films = filmStorage.getFilmsByDirector(query, by);
-            }
-        }
-        if (by.size() == 2 && by.contains("director") && by.contains("title")) {
-            films = filmStorage.getFilmsByDirectorAndTitle(query, by);
-        }
-        return films;
+    public List<Film> getFilmsByTitle(String query) {
+        return filmStorage.getFilmsByTitle(query);
+    }
+
+    public List<Film> getFilmsByDirector(String query) {
+        return filmStorage.getFilmsByTitle(query);
+    }
+
+    public List<Film> getFilmsByDirectorAndTitle(String query) {
+        return filmStorage.getFilmsByTitle(query);
     }
 }

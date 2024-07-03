@@ -59,7 +59,20 @@ public class FilmController {
     @GetMapping("/search")
     public List<Film> getFilmsByQuery(@RequestParam String query,
                                       @RequestParam Set<String> by) {
-        return filmService.getFilmsByQuery(query, by);
+        query = "%" + query + "%";
+        List<Film> films = new ArrayList<Film>();
+        if (by.size() < 2) {
+            if (by.contains("title")) {
+                films = filmService.getFilmsByTitle(query);
+            }
+            if (by.contains("director")) {
+                films = filmService.getFilmsByDirector(query);
+            }
+        }
+        if (by.size() == 2 && by.contains("director") && by.contains("title")) {
+            films = filmService.getFilmsByDirectorAndTitle(query);
+        }
+        return films;
     }
 
     @GetMapping("/director/{directorId}")

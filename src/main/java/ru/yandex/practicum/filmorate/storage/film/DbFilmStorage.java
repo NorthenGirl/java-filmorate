@@ -263,7 +263,7 @@ public class DbFilmStorage implements FilmStorage {
         }
     }
 
-    public List<Film> getFilmsByDirectorAndTitle(String query, Set<String> by) {
+    public List<Film> getFilmsByDirectorAndTitle(String query) {
         String sqlQuery = """
                 SELECT
                     FLM.FILM_ID,
@@ -292,7 +292,7 @@ public class DbFilmStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery, filmMapper::mapRow, query, query);
     }
 
-    public List<Film> getFilmsByTitle(String query, Set<String> by) {
+    public List<Film> getFilmsByTitle(String query) {
         String sqlQuery = """
                 SELECT
                     FLM.FILM_ID,
@@ -320,7 +320,7 @@ public class DbFilmStorage implements FilmStorage {
         return jdbcTemplate.query(sqlQuery, filmMapper::mapRow, query);
     }
 
-    public List<Film> getFilmsByDirector(String query, Set<String> by) {
+    public List<Film> getFilmsByDirector(String query) {
         String sqlQuery = """
                 SELECT
                     FLM.FILM_ID,
