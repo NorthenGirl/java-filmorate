@@ -25,6 +25,39 @@ public class DbFilmStorage implements FilmStorage {
     private final FilmMapper filmMapper;
 
     @Override
+    public List<Film> getRecommendationsForUser(Long userId) {
+        String getRecommendedFilmsQuery = """
+                SELECT likes.film_id,
+                       flm.name,
+                       flm.description,
+                       flm.releasedate,
+                       flm.duration,
+                       mr.id AS rating_id,
+                       mr.name AS rating_name,
+                       g2.id AS genre_id,
+                       g2.name AS genre_name,
+                       d.id AS director_id,
+                       d.name AS director_name
+                FROM likes
+                JOIN films AS flm ON likes.film_id=flm.film_id
+                LEFT JOIN mpa_rating mr ON mr.id = flm.rating_id
+                LEFT JOIN film_genres fg ON flm.film_id = fg.film_id
+                LEFT JOIN genres g2 ON g2.id = fg.genre_id
+                LEFT JOIN film_directors fd ON flm.film_id = fd.film_id
+                LEFT JOIN directors d ON d.id = fd.director_id
+                WHERE likes.user_id IN (
+                      SELECT likes.user_id
+                      FROM likes
+                      WHERE likes.film_id IN (SELECT likes.film_id FROM likes WHERE likes.user_id=?) AND likes.user_id<>?
+                      GROUP BY likes.user_id
+                      ORDER BY COUNT(*) DESC
+                      LIMIT 1)
+                      AND likes.film_id NOT IN (SELECT likes.film_id FROM likes WHERE likes.user_id=?)
+                """;
+        return jdbcTemplate.query(getRecommendedFilmsQuery, filmMapper, userId, userId, userId);
+    }
+
+    @Override
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     public List<Film> getCommonFilms(Long userId, Long friendId) {
         throwIfUserIsAbsent(userId);
@@ -96,6 +129,7 @@ public class DbFilmStorage implements FilmStorage {
                 LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
                 LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
                 LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
+
                 """;
         List<Film> films = jdbcTemplate.query(sqlQery, filmMapper::mapRow);
 
