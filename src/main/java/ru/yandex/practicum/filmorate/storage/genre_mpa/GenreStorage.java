@@ -9,7 +9,5 @@ public interface GenreStorage {
 
     List<Genre> getAll();
 
-    Genre getFromFilm(Long filmId);
-
     void genreValidate(List<Genre> genres);
 }
