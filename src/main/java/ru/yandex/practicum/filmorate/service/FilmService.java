@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.storage.director.DbDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre_mpa.GenreStorage;
@@ -30,6 +28,7 @@ public class FilmService {
     private final MpaStorage mpaStorage;
     private final UserStorage userStorage;
     private final DbDirectorStorage directorStorage;
+    private final EventService eventService;
 
     public Collection<Film> getCommonFilms(Long userId, Long friendId) {
         return filmStorage.getCommonFilms(userId, friendId);
@@ -93,6 +92,8 @@ public class FilmService {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
         likesStorage.addLike(userId, filmId);
+        eventService.createEvent(userId, EventType.LIKE, EventOperation.ADD, filmId);
+        eventService.createEvent(userId, EventType.LIKE, EventOperation.REMOVE, filmId);
     }
 
     public void deleteLike(Long filmId, Long userId) {

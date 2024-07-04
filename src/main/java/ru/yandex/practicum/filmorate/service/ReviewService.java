@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.EventOperation;
+import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 
@@ -16,16 +18,19 @@ public class ReviewService {
     private final ReviewStorage reviewStorage;
     private final UserService userService;
     private final FilmService filmService;
+    private final EventService eventService;
 
     public Review create(Review review) {
         reviewValidation(review);
         Review createdReview = reviewStorage.create(review);
+        eventService.createEvent(createdReview.getUserId(), EventType.REVIEW, EventOperation.ADD, createdReview.getReviewId());
         return createdReview;
     }
 
     public Review update(Review newReview) {
         reviewValidation(newReview);
         Review updatedReview = reviewStorage.update(newReview);
+        eventService.createEvent(updatedReview.getUserId(), EventType.REVIEW, EventOperation.UPDATE, updatedReview.getReviewId());
         return updatedReview;
     }
 
@@ -33,6 +38,7 @@ public class ReviewService {
         Review review = reviewStorage.get(id).orElseThrow(() ->
                 new NotFoundException("Отзыв с id = " + id + " не найден"));
         reviewStorage.delete(id);
+        eventService.createEvent(review.getUserId(), EventType.REVIEW, EventOperation.REMOVE, review.getReviewId());
     }
 
     public Review get(long id) {

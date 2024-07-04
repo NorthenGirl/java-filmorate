@@ -14,8 +14,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.model.Event;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.EventService;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.Collection;
@@ -27,7 +29,7 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
-
+    private final EventService eventService;
 
     @GetMapping
     public Collection<User> findAll() {
@@ -75,5 +77,10 @@ public class UserController {
     @GetMapping("/{id}")
     public User getUser(@PathVariable Long id) {
         return userService.getUser(id);
+    }
+
+    @GetMapping("/{id}/feed")
+    public List<Event> getFeed(@PathVariable int id) {
+        return eventService.getFeed(id);
     }
 }
