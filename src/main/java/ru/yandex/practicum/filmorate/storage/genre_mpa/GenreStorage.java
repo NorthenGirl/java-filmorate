@@ -11,5 +11,4 @@ public interface GenreStorage {
 
     void genreValidate(List<Genre> genres);
 
-    void deleteGenreByFilmId(Long id);
 }

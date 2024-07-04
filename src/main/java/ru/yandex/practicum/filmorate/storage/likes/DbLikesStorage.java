@@ -32,9 +32,4 @@ public class DbLikesStorage implements LikesStorage {
         }
     }
 
-    @Override
-    public void deleteLikesByFilmId(Long filmId) {
-        String sqlQuery = "DELETE FROM likes WHERE film_id = ?";
-        jdbcTemplate.update(sqlQuery, filmId);
-    }
 }

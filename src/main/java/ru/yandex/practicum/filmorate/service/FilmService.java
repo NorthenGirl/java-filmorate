@@ -136,10 +136,6 @@ public class FilmService {
             throw new NotFoundException("Фильм с id " + id + " не найден");
         }
 
-        likesStorage.deleteLikesByFilmId(id);
-
-        genreStorage.deleteGenreByFilmId(id);
-
         filmStorage.delete(id);
     }
 }

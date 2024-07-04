@@ -5,5 +5,4 @@ public interface LikesStorage {
 
     void deleteLike(Long userId, Long filmId);
 
-    void deleteLikesByFilmId(Long filmId);
 }
