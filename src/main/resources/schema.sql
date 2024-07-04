@@ -10,6 +10,7 @@ DROP TABLE IF EXISTS FILM_GENRES CASCADE;
 DROP TABLE IF EXISTS FILM_DIRECTORS CASCADE;
 DROP TABLE IF EXISTS REVIEWS CASCADE;
 DROP TABLE IF EXISTS REVIEW_RATING CASCADE;
+DROP TABLE IF EXISTS FEED CASCADE;
 
 create table if not exists USERS
 (
@@ -97,5 +98,12 @@ create table if not exists REVIEW_RATING
     primary key (review_id, user_id)
 );
 
-
-
+create table if not exists FEED
+(
+    event_id   bigint auto_increment primary key,
+    user_id    bigint references USERS (id) ON DELETE CASCADE,
+    timestamp  bigint not null,
+    event_type text not null,
+    operation  text not null,
+    entity_id  bigint not null
+);

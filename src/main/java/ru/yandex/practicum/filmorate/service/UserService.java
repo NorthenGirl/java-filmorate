@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.EventOperation;
+import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.friends.FriendsStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -15,6 +17,7 @@ import java.util.List;
 public class UserService {
     private final UserStorage userStorage;
     private final FriendsStorage friendsStorage;
+    private final EventService eventService;
 
     public Collection<User> findAll() {
         return userStorage.findAll();
@@ -39,6 +42,7 @@ public class UserService {
             throw new NotFoundException("Друг с  id = " + friendId + " не найден");
         }
         friendsStorage.addFriend(userId, friendId);
+        eventService.createEvent(userId, EventType.FRIEND, EventOperation.ADD, friendId);
     }
 
     public void deleteFriend(Long userId, Long friendId) {
@@ -49,6 +53,7 @@ public class UserService {
             throw new NotFoundException("У пользователя с id = " + userId + " не друга с  id = " + friendId);
         }
         friendsStorage.deleteFriend(userId, friendId);
+        eventService.createEvent(userId, EventType.FRIEND, EventOperation.REMOVE, friendId);
     }
 
     public List<User> getFriends(Long userId) {
