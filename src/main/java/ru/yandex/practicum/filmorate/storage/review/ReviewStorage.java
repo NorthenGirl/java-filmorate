@@ -15,7 +15,7 @@ public interface ReviewStorage {
 
     Optional<Review> get(long id);
 
-    List<Review> getALl();
+    List<Review> getAll();
 
     List<Review> getByFilm(long id);
 

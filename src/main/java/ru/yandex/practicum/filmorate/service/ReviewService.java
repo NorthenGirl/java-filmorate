@@ -50,7 +50,7 @@ public class ReviewService {
         List<Review> reviews;
 
         if (filmId == -1) {
-            reviews = reviewStorage.getALl();
+            reviews = reviewStorage.getAll();
         } else {
             reviews = reviewStorage.getByFilm(filmId);
         }
@@ -97,17 +97,11 @@ public class ReviewService {
     }
 
     private void reviewValidation(Review review) {
-        if (review.getContent() == null || review.getContent().isBlank()) {
-            throw new ValidationException("Содержание отзыва пустое");
-        }
         if (review.getUserId() == null || userService.getUser(review.getUserId()) == null) {
-            throw new ValidationException("Данные о пользователе отсутствуют");
+            throw new ValidationException("Данные о пользователе отсутствуют в базе данных");
         }
         if (review.getFilmId() == null || filmService.getFilm(review.getFilmId()) == null) {
-            throw new ValidationException("Данные о фильме отсутствуют");
-        }
-        if (review.getIsPositive() == null) {
-            throw new ValidationException("Тип отзыва не определен");
+            throw new ValidationException("Данные о фильме отсутствуют в базе данных");
         }
         review.setUseful(0L);
     }

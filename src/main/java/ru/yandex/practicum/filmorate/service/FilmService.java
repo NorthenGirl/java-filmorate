@@ -93,7 +93,6 @@ public class FilmService {
         }
         likesStorage.addLike(userId, filmId);
         eventService.createEvent(userId, EventType.LIKE, EventOperation.ADD, filmId);
-        eventService.createEvent(userId, EventType.LIKE, EventOperation.REMOVE, filmId);
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -104,6 +103,7 @@ public class FilmService {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
         likesStorage.deleteLike(userId, filmId);
+        eventService.createEvent(userId, EventType.LIKE, EventOperation.REMOVE, filmId);
     }
 
     public List<Film> getPopularFilms(Integer count) {

@@ -77,7 +77,7 @@ public class DbReviewStorage implements ReviewStorage {
     }
 
     @Override
-    public List<Review> getALl() {
+    public List<Review> getAll() {
         String sqlQuery = """
                 SELECT id, content, is_positive, user_id, film_id, useful
                 FROM reviews
@@ -117,12 +117,12 @@ public class DbReviewStorage implements ReviewStorage {
 
     @Override
     public void deleteLikeToReview(long reviewId, long userId) {
-        deleteReviewRating(reviewId, userId);
+        deleteReviewRating(reviewId, userId, Boolean.TRUE);
     }
 
     @Override
     public void deleteDislikeToReview(long reviewId, long userId) {
-        deleteDislikeToReview(reviewId, userId);
+        deleteReviewRating(reviewId, userId, Boolean.FALSE);
     }
 
     private void addReviewRating(long reviewId, long userId, boolean isPositive) {
@@ -137,13 +137,13 @@ public class DbReviewStorage implements ReviewStorage {
         updateReviewRating(reviewId);
     }
 
-    private void deleteReviewRating(long reviewId, long userId) {
+    private void deleteReviewRating(long reviewId, long userId, boolean isPositive) {
         String sqlQuery = """
                 DELETE FROM review_rating
-                WHERE review_id = ? AND user_id = ?
+                WHERE review_id = ? AND user_id = ? AND is_positive = ?
                 """;
 
-        jdbcTemplate.update(sqlQuery, reviewId, userId);
+        jdbcTemplate.update(sqlQuery, reviewId, userId, isPositive);
         updateReviewRating(reviewId);
     }
 
