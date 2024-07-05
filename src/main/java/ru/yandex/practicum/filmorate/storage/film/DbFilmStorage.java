@@ -17,6 +17,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @Repository
@@ -138,12 +139,11 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
-        String sqlQuery =
-                "INSERT INTO films (name, description, releaseDate, duration, rating_id) values (?, ?, ?, ?, ?)";
+        String sqlQuery = "INSERT INTO films (name, description, releaseDate, duration, rating_id) VALUES (?, ?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[]{"film_id"});
+            PreparedStatement stmt = connection.prepareStatement(sqlQuery, new String[] {"film_id"});
             stmt.setString(1, film.getName());
             stmt.setString(2, film.getDescription());
             stmt.setDate(3, Date.valueOf(film.getReleaseDate()));
@@ -151,52 +151,41 @@ public class DbFilmStorage implements FilmStorage {
             stmt.setLong(5, film.getMpa().getId());
             return stmt;
         }, keyHolder);
-        film.setId(keyHolder.getKey().longValue());
-        if (!film.getGenres().isEmpty()) {
-            List<Genre> genres = new ArrayList<>(film.getGenres());
-            for (Genre genre : genres) {
-                if (genre.getId() != null) {
-                    jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id)values(?,?)", +film.getId(), genre.getId());
-                }
-            }
-        }
-        if (!film.getDirectors().isEmpty()) {
-            List<Director> directors = new ArrayList<>(film.getDirectors());
-            for (Director director : directors) {
-                if (director.getId() != null) {
-                    jdbcTemplate.update("INSERT INTO film_directors (film_id, director_id) values (?, ?)", +film.getId(), director.getId());
-                }
-            }
-        }
+
+        film.setId(Objects.requireNonNull(keyHolder.getKey()).longValue());
+        addGenresToFilm(film);
+        addDirectorsToFilm(film);
         return film;
     }
 
+
     @Override
     public Film update(Film film) {
-        updateValidate(film);
-        String sqlQuery = "update films SET name = ?, description = ?, releaseDate = ?, duration = ?, rating_id = ?" + " WHERE film_id = ?";
+        String sqlQuery = "UPDATE films SET name = ?, description = ?, releaseDate = ?, duration = ?, rating_id = ? WHERE film_id = ?";
         jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), film.getId());
         jdbcTemplate.update("DELETE FROM film_genres WHERE film_id = ?", film.getId());
+        jdbcTemplate.update("DELETE FROM film_directors WHERE film_id = ?", film.getId());
+        addGenresToFilm(film);
+        addDirectorsToFilm(film);
+        return film;
+    }
+
+    private void addGenresToFilm(Film film) {
         if (!film.getGenres().isEmpty()) {
             List<Genre> genres = new ArrayList<>(film.getGenres());
             for (Genre genre : genres) {
-                if (genre.getId() != null) {
-                    jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id) values(?,?)", +film.getId(), genre.getId());
-                }
+                jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)", film.getId(), genre.getId());
             }
         }
-        jdbcTemplate.update("DELETE FROM film_directors WHERE film_id = ?", film.getId());
+    }
+
+    private void addDirectorsToFilm(Film film) {
         if (!film.getDirectors().isEmpty()) {
             List<Director> directors = new ArrayList<>(film.getDirectors());
             for (Director director : directors) {
-                if (director.getId() != null) {
-                    jdbcTemplate.update("INSERT INTO film_directors (film_id, director_id) values (?, ?)", film.getId(),
-                            director.getId());
-                }
+                jdbcTemplate.update("INSERT INTO film_directors (film_id, director_id) VALUES (?, ?)", film.getId(), director.getId());
             }
-
         }
-        return film;
     }
 
     @Override

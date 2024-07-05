@@ -11,57 +11,61 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Component
 public class FilmMapper implements RowMapper<Film> {
+
     private Map<Long, Film> films = new HashMap<>();
 
+    @Override
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
         Long id = rs.getLong("film_id");
-        Film film = films.get(id);
-        if (film == null) {
-            film = Film.builder()
-                    .id(id)
-                    .name(rs.getString("name"))
-                    .description(rs.getString("description"))
-                    .releaseDate(rs.getDate("releaseDate").toLocalDate())
-                    .duration(rs.getInt("duration"))
-                    .genres(new ArrayList<Genre>())
-                    .directors(new ArrayList<Director>())
-                    .mpa(MPA.builder()
-                            .id(rs.getLong("rating_id"))
-                            .name(rs.getString("rating_name"))
-                            .build())
-                    .build();
-            films.put(id, film);
-        }
+        Film film = films.computeIfAbsent(id, k -> {
+            try {
+                return Film.builder()
+                        .id(id)
+                        .name(rs.getString("name"))
+                        .description(rs.getString("description"))
+                        .releaseDate(rs.getDate("releaseDate").toLocalDate())
+                        .duration(rs.getInt("duration"))
+                        .genres(new ArrayList<>())
+                        .directors(new ArrayList<>())
+                        .mpa(MPA.builder()
+                                .id(rs.getLong("rating_id"))
+                                .name(rs.getString("rating_name"))
+                                .build())
+                        .build();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
         if (rs.getLong("genre_id") != 0) {
-            if (!film.getGenres().contains(Genre.builder()
+            Genre genre = Genre.builder()
                     .id(rs.getLong("genre_id"))
                     .name(rs.getString("genre_name"))
-                    .build())) {
-                film.getGenres().add(Genre.builder()
-                        .id(rs.getLong("genre_id"))
-                        .name(rs.getString("genre_name"))
-                        .build());
+                    .build();
+            if (!film.getGenres().contains(genre)) {
+                film.getGenres().add(genre);
             }
         }
 
         if (rs.getLong("director_id") != 0) {
-            if (!film.getDirectors().contains(Director.builder()
+            Director director = Director.builder()
                     .id(rs.getLong("director_id"))
                     .name(rs.getString("director_name"))
-                    .build()) || film.getDirectors().size() == 0) {
-                film.getDirectors().add(Director.builder()
-                        .id(rs.getLong("director_id"))
-                        .name(rs.getString("director_name"))
-                        .build());
+                    .build();
+            if (!film.getDirectors().contains(director)) {
+                film.getDirectors().add(director);
             }
         }
+
         if (rs.isLast()) {
+            LinkedHashMap<Long, Film> lastFilms = new LinkedHashMap<>(films);
             films.clear();
+            return lastFilms.get(id);
         }
         return film;
     }
