@@ -24,5 +24,5 @@ public interface FilmStorage {
 
     List<Film> getFilmsByDirectorIdSortedByYear(Long directorId);
 
-    List<Film> getRecommendationsForUser(Long userId);
+    public List<Film> getRecommendationsForUser(Long userId);
 }
