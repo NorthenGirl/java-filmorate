@@ -139,4 +139,13 @@ public class FilmService {
         }
         return filmStorage.getFilmsByDirectorIdSortedByYear(directorId);
     }
+
+    public void deleteFilm(Long id) {
+        Film film = filmStorage.getFilm(id);
+        if (film == null) {
+            throw new NotFoundException("Фильм с id " + id + " не найден");
+        }
+
+        filmStorage.delete(id);
+    }
 }

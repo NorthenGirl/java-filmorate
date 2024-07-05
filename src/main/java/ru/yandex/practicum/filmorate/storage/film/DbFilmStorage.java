@@ -156,8 +156,7 @@ public class DbFilmStorage implements FilmStorage {
             List<Genre> genres = new ArrayList<>(film.getGenres());
             for (Genre genre : genres) {
                 if (genre.getId() != null) {
-                    jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id)values(?,?)", +
-                            film.getId(), genre.getId());
+                    jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id)values(?,?)", +film.getId(), genre.getId());
                 }
             }
         }
@@ -165,8 +164,7 @@ public class DbFilmStorage implements FilmStorage {
             List<Director> directors = new ArrayList<>(film.getDirectors());
             for (Director director : directors) {
                 if (director.getId() != null) {
-                    jdbcTemplate.update("INSERT INTO film_directors (film_id, director_id) values (?, ?)", +
-                            film.getId(), director.getId());
+                    jdbcTemplate.update("INSERT INTO film_directors (film_id, director_id) values (?, ?)", +film.getId(), director.getId());
                 }
             }
         }
@@ -176,24 +174,14 @@ public class DbFilmStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
         updateValidate(film);
-        String sqlQuery = "update films SET name = ?, description = ?, releaseDate = ?, duration = ?, rating_id = ?" +
-                " WHERE film_id = ?";
-        jdbcTemplate.update(
-                sqlQuery,
-                film.getName(),
-                film.getDescription(),
-                film.getReleaseDate(),
-                film.getDuration(),
-                film.getMpa().getId(),
-                film.getId()
-        );
+        String sqlQuery = "update films SET name = ?, description = ?, releaseDate = ?, duration = ?, rating_id = ?" + " WHERE film_id = ?";
+        jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), film.getId());
         jdbcTemplate.update("DELETE FROM film_genres WHERE film_id = ?", film.getId());
         if (!film.getGenres().isEmpty()) {
             List<Genre> genres = new ArrayList<>(film.getGenres());
             for (Genre genre : genres) {
                 if (genre.getId() != null) {
-                    jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id) values(?,?)", +
-                            film.getId(), genre.getId());
+                    jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id) values(?,?)", +film.getId(), genre.getId());
                 }
             }
         }
@@ -213,8 +201,11 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public void delete(Long id) {
-        String sqlQuery = "delete from films WHERE film_id = ?";
-        jdbcTemplate.update(sqlQuery, id);
+        String sqlQuery = "DELETE FROM films WHERE film_id = ?";
+        int rowsAffected = jdbcTemplate.update(sqlQuery, id);
+        if (rowsAffected == 0) {
+            throw new NotFoundException("Фильм с id " + id + " не найден");
+        }
     }
 
     public Film getFilm(Long id) {
