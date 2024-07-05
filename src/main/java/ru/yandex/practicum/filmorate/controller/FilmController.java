@@ -1,11 +1,20 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -17,8 +26,15 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/films")
+@Validated
 public class FilmController {
     private final FilmService filmService;
+
+    @GetMapping("/common")
+    public Collection<Film> getCommonFilms(@RequestParam("userId") @Positive Long userId,
+                                           @RequestParam("friendId") @Positive Long friendId) {
+        return filmService.getCommonFilms(userId, friendId);
+    }
 
     @GetMapping
     public Collection<Film> findAll() {
@@ -43,18 +59,23 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public void addLike(@PathVariable Long userId, @PathVariable Long id) {
+    public void addLike(@PathVariable("userId") Long userId, @PathVariable("id") Long id) {
+        log.info("Добавлен like пользователя id={} для фильма id={}", userId, id);
         filmService.addLike(userId, id);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
+        log.info("Удален like пользователя id={} c фильма id={}", userId, id);
         filmService.deleteLike(id, userId);
     }
 
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(required = false) Integer count) {
-        return filmService.getPopularFilms(count);
+    public List<Film> getPopularFilms(
+            @RequestParam(value = "count", required = false, defaultValue = "10") @Min(1) Integer count,
+            @RequestParam(value = "genreId", required = false) Long genreId,
+            @RequestParam(value = "year", required = false) @Min(1895) Integer year) {
+        return filmService.getPopularFilms(count, genreId, year);
     }
 
     @GetMapping("/director/{directorId}")
@@ -69,14 +90,9 @@ public class FilmController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteFilm(@PathVariable Long id) {
-        if (id > 0) {
+    public void deleteFilm(@PathVariable Long id) {
             filmService.deleteFilm(id);
             log.info("Фильм с id {} удален", id);
-        } else {
-            throw new NotFoundException("Фильм с id " + id + " не существует");
-        }
-        return ResponseEntity.noContent().build();
     }
 
 }
