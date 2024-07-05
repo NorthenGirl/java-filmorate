@@ -20,7 +20,7 @@ public interface FilmStorage {
 
     List<Film> getCommonFilms(Long userId, Long friendId);
 
-    public List<Film> getFilmsByDirectorIdSortedByLikes(Long directorId);
+    List<Film> getFilmsByDirectorIdSortedByLikes(Long directorId);
 
     List<Film> getFilmsByDirectorIdSortedByYear(Long directorId);
 
