@@ -21,6 +21,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -76,6 +77,25 @@ public class FilmController {
             @RequestParam(value = "genreId", required = false) Long genreId,
             @RequestParam(value = "year", required = false) @Min(1895) Integer year) {
         return filmService.getPopularFilms(count, genreId, year);
+    }
+
+    @GetMapping("/search")
+    public List<Film> getFilmsByQuery(@RequestParam String query,
+                                      @RequestParam Set<String> by) {
+        query = "%" + query + "%";
+        List<Film> films = new ArrayList<Film>();
+        if (by.size() < 2) {
+            if (by.contains("title")) {
+                films = filmService.getFilmsByTitle(query);
+            }
+            if (by.contains("director")) {
+                films = filmService.getFilmsByDirector(query);
+            }
+        }
+        if (by.size() == 2 && by.contains("director") && by.contains("title")) {
+            films = filmService.getFilmsByDirectorAndTitle(query);
+        }
+        return films;
     }
 
     @GetMapping("/director/{directorId}")

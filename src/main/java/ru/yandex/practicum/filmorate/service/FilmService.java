@@ -139,7 +139,7 @@ public class FilmService {
         }
         return filmStorage.getFilmsByDirectorIdSortedByYear(directorId);
     }
-
+  
     public void deleteFilm(Long id) {
         Film film = filmStorage.getFilm(id);
         if (film == null) {
@@ -147,5 +147,17 @@ public class FilmService {
         }
 
         filmStorage.delete(id);
+    }
+  
+      public List<Film> getFilmsByTitle(String query) {
+        return filmStorage.getFilmsByTitle(query);
+    }
+
+    public List<Film> getFilmsByDirector(String query) {
+        return filmStorage.getFilmsByDirector(query);
+    }
+
+    public List<Film> getFilmsByDirectorAndTitle(String query) {
+        return filmStorage.getFilmsByDirectorAndTitle(query);
     }
 }

@@ -1,3 +1,13 @@
+DROP table if exists USERS cascade;
+DROP table if exists FRIENDSHIP_STATUS cascade;
+DROP table if exists FRIENDS cascade;
+DROP table if exists GENRES cascade;
+DROP table if exists MPA_RATING cascade;
+DROP table if exists DIRECTORS cascade;
+DROP table if exists FILMS cascade;
+DROP table if exists LIKES cascade;
+DROP table if exists FILM_GENRES cascade;
+DROP table if exists FILM_DIRECTORS cascade;
 
 create table if not exists USERS
 (
