@@ -40,4 +40,5 @@ public class DbGenreStorage implements GenreStorage {
             }
         }
     }
+
 }

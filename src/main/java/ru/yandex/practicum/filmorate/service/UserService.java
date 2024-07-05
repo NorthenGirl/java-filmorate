@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.friends.FriendsStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -15,6 +17,14 @@ import java.util.List;
 public class UserService {
     private final UserStorage userStorage;
     private final FriendsStorage friendsStorage;
+    private final FilmStorage filmStorage;
+
+    public Collection<Film> getRecommendationsForUser(Long userId) {
+        if (userStorage.getUser(userId) == null) {
+            throw new NotFoundException("Пользователь с  id = " + userId + " не найден");
+        }
+        return filmStorage.getRecommendationsForUser(userId);
+    }
 
     public Collection<User> findAll() {
         return userStorage.findAll();
@@ -70,5 +80,9 @@ public class UserService {
 
     public User getUser(Long id) {
         return userStorage.getUser(id);
+    }
+
+    public long deleteUser(long id) {
+        return userStorage.delete(id);
     }
 }

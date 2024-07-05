@@ -10,4 +10,5 @@ public interface GenreStorage {
     List<Genre> getAll();
 
     void genreValidate(List<Genre> genres);
+
 }
