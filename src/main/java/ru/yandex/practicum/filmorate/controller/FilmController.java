@@ -1,21 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -27,7 +17,6 @@ import java.util.List;
 @RestController
 @AllArgsConstructor
 @RequestMapping("/films")
-@Validated
 public class FilmController {
     private final FilmService filmService;
 
@@ -81,6 +70,12 @@ public class FilmController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFilm(@PathVariable Long id) {
+        if (id > 0) {
+            filmService.deleteFilm(id);
+            log.info("Фильм с id {} удален", id);
+        } else {
+            throw new NotFoundException("Фильм с id " + id + " не существует");
+        }
         return ResponseEntity.noContent().build();
     }
 

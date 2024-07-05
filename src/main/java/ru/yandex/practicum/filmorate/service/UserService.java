@@ -73,11 +73,6 @@ public class UserService {
     }
 
     public long deleteUser(long id) {
-        if (id > 0) {
-            return userStorage.delete(id);
-        } else {
-            throw new NotFoundException("Пользователь с id " + id + " не существует");
-        }
-
+        return userStorage.delete(id);
     }
 }

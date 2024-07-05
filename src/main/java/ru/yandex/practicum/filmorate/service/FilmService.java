@@ -31,16 +31,10 @@ public class FilmService {
     private final UserStorage userStorage;
     private final DbDirectorStorage directorStorage;
 
-    public Collection<Film> getCommonFilms(Long userId, Long friendId) {
-        return filmStorage.getCommonFilms(userId, friendId);
-    }
-
-
     public Collection<Film> findAll() {
         Set<Long> ids = filmStorage.findAll().stream().map(Film::getId).collect(Collectors.toSet());
         ArrayList<Film> films = new ArrayList<>();
-        ids.stream()
-                .forEach(id -> films.add(filmStorage.getFilm(id)));
+        ids.stream().forEach(id -> films.add(filmStorage.getFilm(id)));
         return films;
     }
 
@@ -49,13 +43,11 @@ public class FilmService {
         film.getMpa().setName(mpaStorage.getById(film.getMpa().getId()).getName());
         if (!film.getGenres().isEmpty()) {
             genreStorage.genreValidate(film.getGenres());
-            film.getGenres().stream()
-                    .forEach(genre -> genre.setName(genreStorage.getById(genre.getId()).getName()));
+            film.getGenres().stream().forEach(genre -> genre.setName(genreStorage.getById(genre.getId()).getName()));
         }
         if (!film.getDirectors().isEmpty()) {
             directorStorage.directorValidate(film.getDirectors());
-            film.getDirectors().stream()
-                    .forEach(director -> director.setName(directorStorage.getById(director.getId()).getName()));
+            film.getDirectors().stream().forEach(director -> director.setName(directorStorage.getById(director.getId()).getName()));
         }
         return filmStorage.create(film);
     }
@@ -67,15 +59,13 @@ public class FilmService {
             genreStorage.genreValidate(film.getGenres());
             Set<Long> ids = film.getGenres().stream().map(Genre::getId).collect(Collectors.toSet());
             ArrayList<Genre> genres = new ArrayList<>();
-            ids.stream()
-                    .forEach(id -> genres.add(genreStorage.getById(id)));
+            ids.stream().forEach(id -> genres.add(genreStorage.getById(id)));
             film.setGenres(genres);
         }
 
         if (!film.getDirectors().isEmpty()) {
             directorStorage.directorValidate(film.getDirectors());
-            film.getDirectors().stream()
-                    .forEach(director -> director.setName(directorStorage.getById(director.getId()).getName()));
+            film.getDirectors().stream().forEach(director -> director.setName(directorStorage.getById(director.getId()).getName()));
         }
 
         return filmStorage.update(film);
@@ -102,11 +92,11 @@ public class FilmService {
         if (userStorage.getUser(userId) == null) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
-        likesStorage.deleteLike(userId, filmId);
+        likesStorage.deleteLike(filmId, userId);
     }
 
     public List<Film> getPopularFilms(Integer count) {
-        return filmStorage.getIdPopularFilms(count, genreId, year);
+        return filmStorage.getIdPopularFilms(count);
     }
 
     public List<Genre> getAllGenres() {
@@ -145,10 +135,7 @@ public class FilmService {
         if (film == null) {
             throw new NotFoundException("Фильм с id " + id + " не найден");
         }
-        if (id > 0) {
-            filmStorage.delete(id);
-        } else {
-            throw new NotFoundException("Пользователь с id " + id + " не существует");
-        }
+
+        filmStorage.delete(id);
     }
 }
