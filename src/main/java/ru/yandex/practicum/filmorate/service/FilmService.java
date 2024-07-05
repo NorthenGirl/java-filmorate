@@ -145,11 +145,10 @@ public class FilmService {
         if (film == null) {
             throw new NotFoundException("Фильм с id " + id + " не найден");
         }
-
         filmStorage.delete(id);
     }
   
-      public List<Film> getFilmsByTitle(String query) {
+    public List<Film> getFilmsByTitle(String query) {
         return filmStorage.getFilmsByTitle(query);
     }
 
