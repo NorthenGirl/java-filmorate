@@ -1,11 +1,9 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import ru.yandex.practicum.filmorate.exception.MethodArgumentNotValidException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
@@ -21,8 +19,8 @@ public class RestControllerAdvice {
     public ResponseEntity<ErrorResponse> handleNotFoundException(final NotFoundException e) {
         log.info("404 {}", e.getMessage());
         return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .body(new ErrorResponse(e.getMessage()));
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler
@@ -30,18 +28,8 @@ public class RestControllerAdvice {
     public ResponseEntity<ErrorResponse> handleValidationException(final ValidationException e) {
         log.info("400 {}", e.getMessage());
         return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(new ErrorResponse(e.getMessage()));
-    }
-
-    @ExceptionHandler(ConstraintViolationException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public ResponseEntity<ErrorResponse> handleConstraintViolationException(final ConstraintViolationException e) {
-        log.info("400 {}", e.getMessage());
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(new ErrorResponse(e.getMessage()));
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getMessage()));
     }
 
     @ExceptionHandler
@@ -49,7 +37,7 @@ public class RestControllerAdvice {
     public ResponseEntity<ErrorResponse> handleMethodArgumentNotValid(final MethodArgumentNotValidException e) {
         log.info("400 {}", e.getMessage());
         return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(new ErrorResponse(e.getMessage()));
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getMessage()));
     }
 }

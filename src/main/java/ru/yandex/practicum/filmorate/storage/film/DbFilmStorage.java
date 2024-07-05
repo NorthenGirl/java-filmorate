@@ -138,8 +138,7 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public Film create(Film film) {
-        String sqlQuery =
-                "INSERT INTO films (name, description, releaseDate, duration, rating_id) values (?, ?, ?, ?, ?)";
+        String sqlQuery = "INSERT INTO films (name, description, releaseDate, duration, rating_id) values (?, ?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -202,8 +201,7 @@ public class DbFilmStorage implements FilmStorage {
             List<Director> directors = new ArrayList<>(film.getDirectors());
             for (Director director : directors) {
                 if (director.getId() != null) {
-                    jdbcTemplate.update("INSERT INTO film_directors (film_id, director_id) values (?, ?)", film.getId(),
-                            director.getId());
+                    jdbcTemplate.update("INSERT INTO film_directors (film_id, director_id) values (?, ?)", film.getId(), director.getId());
                 }
             }
 
@@ -247,12 +245,11 @@ public class DbFilmStorage implements FilmStorage {
     }
 
     @Override
-    public List<Film> getIdPopularFilms(Integer count, Long genreId, Integer year) {
+    public List<Film> getIdPopularFilms(Integer count) {
         if (count == null) {
             count = 10;
         }
-        List<Object> params = new ArrayList<>();
-        StringBuilder sqlQuery = new StringBuilder("""
+        String sqlQuery = """
                 SELECT
                     FLM.FILM_ID,
                     FLM.NAME,
@@ -272,23 +269,13 @@ public class DbFilmStorage implements FilmStorage {
                 LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
                 LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
                 LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l
-                ON (FLM.FILM_ID = l.FILM_ID) WHERE TRUE\s""");
-        if (genreId != null) {
-            sqlQuery.append("""
-                    AND GENRE_ID = ?\s""");
-            params.add(genreId);
-        }
-        if (year != null) {
-            sqlQuery.append("""
-                    AND EXTRACT(YEAR FROM FLM.RELEASEDATE) = ?\s""");
-            params.add(year);
-        }
-        sqlQuery.append("""
+                ON (FLM.FILM_ID = l.FILM_ID)
                 ORDER BY l.likes_count DESC
                 LIMIT ?
-                """);
-        params.add(count);
-        return jdbcTemplate.query(sqlQuery.toString(), filmMapper::mapRow, params.toArray());
+                """;
+
+        List<Film> films = jdbcTemplate.query(sqlQuery, filmMapper::mapRow, count);
+        return films;
     }
 
     @Override
