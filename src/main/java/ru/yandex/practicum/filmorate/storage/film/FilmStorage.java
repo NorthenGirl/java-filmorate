@@ -1,7 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
@@ -26,5 +24,5 @@ public interface FilmStorage {
 
     List<Film> getFilmsByDirectorIdSortedByYear(Long directorId);
 
-    public List<Film> getRecommendationsForUser(Long userId);
+    List<Film> getRecommendationsForUser(Long userId);
 }
