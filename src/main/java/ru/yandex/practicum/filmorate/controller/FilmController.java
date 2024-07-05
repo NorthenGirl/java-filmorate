@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -82,12 +81,6 @@ public class FilmController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFilm(@PathVariable Long id) {
-        if (id > 0) {
-            filmService.deleteFilm(id);
-            log.info("Фильм с id {} удален", id);
-        } else {
-            throw new NotFoundException("Фильм с id " + id + " не существует");
-        }
         return ResponseEntity.noContent().build();
     }
 
