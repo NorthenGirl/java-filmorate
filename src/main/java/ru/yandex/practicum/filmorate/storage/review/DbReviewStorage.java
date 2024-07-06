@@ -44,7 +44,7 @@ public class DbReviewStorage implements ReviewStorage {
     public Review update(Review newReview) {
         String sqlQuery = """
                 UPDATE reviews SET
-                content = ?, is_positive = ?, user_id = ?, film_id = ?, useful = ?
+                content = ?, is_positive = ?, useful = ?
                 WHERE id = ?
                 """;
 
@@ -52,23 +52,21 @@ public class DbReviewStorage implements ReviewStorage {
                 sqlQuery,
                 newReview.getContent(),
                 newReview.getIsPositive(),
-                newReview.getUserId(),
-                newReview.getFilmId(),
                 newReview.getUseful(),
                 newReview.getReviewId()
         );
 
-        return newReview;
+        return get(newReview.getReviewId()).get();
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(long id) {
         String sqlQuery = "DELETE FROM reviews WHERE id = ?";
         jdbcTemplate.update(sqlQuery, id);
     }
 
     @Override
-    public Optional<Review> get(Long id) {
+    public Optional<Review> get(long id) {
         String sqlQuery = """
                 SELECT id, content, is_positive, user_id, film_id, useful
                 FROM reviews
@@ -90,34 +88,35 @@ public class DbReviewStorage implements ReviewStorage {
     }
 
     @Override
-    public List<Review> getByFilm(Long id) {
+    public List<Review> getByFilmLimited(long filmId, Integer count) {
         String sqlQuery = """
                 SELECT id, content, is_positive, user_id, film_id, useful
                 FROM reviews
                 WHERE film_id = ?
                 ORDER BY useful DESC
+                LIMIT ?
                 """;
 
-        return jdbcTemplate.query(sqlQuery, new ReviewMapper(), id);
+        return jdbcTemplate.query(sqlQuery, new ReviewMapper(), filmId, count);
     }
 
     @Override
-    public void addLikeToReview(Long reviewId, Long userId) {
+    public void addLikeToReview(long reviewId, long userId) {
         addReviewRating(reviewId, userId, Boolean.TRUE);
     }
 
     @Override
-    public void addDislikeToReview(Long reviewId, Long userId) {
+    public void addDislikeToReview(long reviewId, long userId) {
         addReviewRating(reviewId, userId, Boolean.FALSE);
     }
 
     @Override
-    public void deleteLikeToReview(Long reviewId, Long userId) {
+    public void deleteLikeToReview(long reviewId, long userId) {
         deleteReviewRating(reviewId, userId, Boolean.TRUE);
     }
 
     @Override
-    public void deleteDislikeToReview(Long reviewId, Long userId) {
+    public void deleteDislikeToReview(long reviewId, long userId) {
         deleteReviewRating(reviewId, userId, Boolean.FALSE);
     }
 
