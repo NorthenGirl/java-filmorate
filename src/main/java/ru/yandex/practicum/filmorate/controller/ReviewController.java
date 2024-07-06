@@ -24,17 +24,17 @@ public class ReviewController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Review create(@Valid @RequestBody Review review) {
-        log.info("Запрос на сохранение информации об отзыве с id = {} к фильму", review.getReviewId());
+        log.info("Запрос на сохранение информации об отзыве {} к фильму", review.toString());
         Review createdReview = reviewService.create(review);
-        log.info("Информация о новом отзыве с id = {} к фильму сохранена", review.getReviewId());
+        log.info("Информация о новом отзыве {} к фильму сохранена", createdReview.toString());
         return createdReview;
     }
 
     @PutMapping
-    public Review update(@Valid @Validated(Update.class) @RequestBody Review newReview) {
-        log.info("Запрос на обновление информации об отзыве c id = {} к фильму", newReview.getReviewId());
+    public Review update(@Validated(Update.class) @RequestBody Review newReview) {
+        log.info("Запрос на обновление информации об отзыве к фильму: {}", newReview.toString());
         Review updatedReview = reviewService.update(newReview);
-        log.info("Информация об отзыве с id = {} к фильму обновлена", newReview.getReviewId());
+        log.info("Информация об отзыве к фильму обновлена: {}", updatedReview.toString());
         return updatedReview;
     }
 
@@ -56,9 +56,7 @@ public class ReviewController {
 
     @GetMapping
     public List<Review> getAll(
-            @RequestParam(name = "filmId", required = false) Long filmId,
-            @RequestParam(name = "count", defaultValue = "10", required = false) int count
-    ) {
+            @RequestParam(name = "filmId", defaultValue = "-1", required = false) long filmId, Integer count) {
         log.info("Запрос информации обо всех отзывах");
         List<Review> reviews = reviewService.getByFilm(filmId, count);
         log.info("Получена информации обо всех отзывах");
