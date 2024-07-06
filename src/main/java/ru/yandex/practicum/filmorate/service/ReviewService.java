@@ -19,14 +19,12 @@ public class ReviewService {
 
     public Review create(Review review) {
         reviewValidation(review);
-        Review createdReview = reviewStorage.create(review);
-        return createdReview;
+        return reviewStorage.create(review);
     }
 
     public Review update(Review newReview) {
         reviewValidation(newReview);
-        Review updatedReview = reviewStorage.update(newReview);
-        return updatedReview;
+        return reviewStorage.update(newReview);
     }
 
     public void delete(long id) {
@@ -91,17 +89,11 @@ public class ReviewService {
     }
 
     private void reviewValidation(Review review) {
-        if (review.getContent() == null || review.getContent().isBlank()) {
-            throw new ValidationException("Содержание отзыва пустое");
+        if (userService.getUser(review.getUserId()) == null) {
+            throw new ValidationException("Данные о пользователе отсутствуют в базе данных");
         }
-        if (review.getUserId() == null || userService.getUser(review.getUserId()) == null) {
-            throw new ValidationException("Данные о пользователе отсутствуют");
-        }
-        if (review.getFilmId() == null || filmService.getFilm(review.getFilmId()) == null) {
-            throw new ValidationException("Данные о фильме отсутствуют");
-        }
-        if (review.getIsPositive() == null) {
-            throw new ValidationException("Тип отзыва не определен");
+        if (filmService.getFilm(review.getFilmId()) == null) {
+            throw new ValidationException("Данные о фильме отсутствуют в базе данных");
         }
         review.setUseful(0L);
     }

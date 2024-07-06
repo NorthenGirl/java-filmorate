@@ -6,15 +6,18 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder(toBuilder = true)
+@Builder
 public class Review {
-    @NotNull(groups = {Update.class})
+    @NotNull(groups = {Update.class, Delete.class})
     Long reviewId;
     @NotNull
     @NotBlank
     String content;
+    @NotNull
     Boolean isPositive;
+    @NotNull
     Long userId;
+    @NotNull
     Long filmId;
     Long useful;
 }

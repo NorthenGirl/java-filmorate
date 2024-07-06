@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.model.Delete;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.model.Update;
 import ru.yandex.practicum.filmorate.service.ReviewService;
@@ -39,7 +40,7 @@ public class ReviewController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") long id) {
+    public void delete(@Validated(Delete.class) @PathVariable("id") long id) {
         log.info("Запрос на удаление информации об отзыве c id = {} к фильму", id);
         reviewService.delete(id);
         log.info("Информация об отзыве с id = {} к фильму удалена", id);
