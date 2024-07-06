@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import lombok.AllArgsConstructor;
@@ -8,13 +9,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.context.WebApplicationContext;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -25,12 +27,17 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
+@WebMvcTest(FilmController.class)
 class FilmControllerTest {
 
     private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    @Autowired
     private MockMvc mockMvc;
+    @Autowired
+    private WebApplicationContext webApplicationContext;
 
     @AllArgsConstructor
     static class ExpectedViolation {
@@ -38,15 +45,13 @@ class FilmControllerTest {
         String message;
     }
 
-    @Mock
+    @MockBean
     private FilmService filmService;
 
-    @InjectMocks
-    private FilmController filmController;
 
     @BeforeEach
     void setMockMvc() {
-        mockMvc = MockMvcBuilders.standaloneSetup(filmController).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(this.webApplicationContext).build();
     }
 
     @Test
@@ -65,8 +70,21 @@ class FilmControllerTest {
         Long userId = -12L;
         Long friendId = 18L;
         String request = String.format("/films/common?userId=%d&friendId=%d", userId, friendId);
-        mockMvc.perform(get(request)).andExpect(
-                result -> assertInstanceOf(HandlerMethodValidationException.class, result.getResolvedException()));
+        System.out.println("request = " + request);
+        mockMvc.perform(get(request)).andExpectAll(
+                status().isBadRequest(),
+                result -> assertInstanceOf(ConstraintViolationException.class, result.getResolvedException()));
+    }
+
+    @Test
+    @DisplayName("check controller for popular films with bad parameters")
+    void badParametersForPopularFilmsControllerTest() throws Exception {
+        Long count = -12L;
+        String request = String.format("/films/popular?count=%d", count);
+        System.out.println("request = " + request);
+        mockMvc.perform(get(request)).andExpectAll(
+                status().isBadRequest(),
+                result -> assertInstanceOf(ConstraintViolationException.class, result.getResolvedException()));
     }
 
 
