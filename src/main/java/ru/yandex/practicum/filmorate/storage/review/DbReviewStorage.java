@@ -8,7 +8,9 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.sql.PreparedStatement;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -60,13 +62,13 @@ public class DbReviewStorage implements ReviewStorage {
     }
 
     @Override
-    public void delete(long id) {
+    public void delete(Long id) {
         String sqlQuery = "DELETE FROM reviews WHERE id = ?";
         jdbcTemplate.update(sqlQuery, id);
     }
 
     @Override
-    public Optional<Review> get(long id) {
+    public Optional<Review> get(Long id) {
         String sqlQuery = """
                 SELECT id, content, is_positive, user_id, film_id, useful
                 FROM reviews
@@ -88,7 +90,7 @@ public class DbReviewStorage implements ReviewStorage {
     }
 
     @Override
-    public List<Review> getByFilm(long id) {
+    public List<Review> getByFilm(Long id) {
         String sqlQuery = """
                 SELECT id, content, is_positive, user_id, film_id, useful
                 FROM reviews
@@ -100,22 +102,22 @@ public class DbReviewStorage implements ReviewStorage {
     }
 
     @Override
-    public void addLikeToReview(long reviewId, long userId) {
+    public void addLikeToReview(Long reviewId, Long userId) {
         addReviewRating(reviewId, userId, Boolean.TRUE);
     }
 
     @Override
-    public void addDislikeToReview(long reviewId, long userId) {
+    public void addDislikeToReview(Long reviewId, Long userId) {
         addReviewRating(reviewId, userId, Boolean.FALSE);
     }
 
     @Override
-    public void deleteLikeToReview(long reviewId, long userId) {
+    public void deleteLikeToReview(Long reviewId, Long userId) {
         deleteReviewRating(reviewId, userId, Boolean.TRUE);
     }
 
     @Override
-    public void deleteDislikeToReview(long reviewId, long userId) {
+    public void deleteDislikeToReview(Long reviewId, Long userId) {
         deleteReviewRating(reviewId, userId, Boolean.FALSE);
     }
 

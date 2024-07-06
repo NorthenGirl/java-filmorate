@@ -56,7 +56,7 @@ public class ReviewController {
 
     @GetMapping
     public List<Review> getAll(
-            @RequestParam(name = "filmId", defaultValue = "-1L", required = false) long filmId,
+            @RequestParam(name = "filmId", required = false) Long filmId,
             @RequestParam(name = "count", defaultValue = "10", required = false) int count
     ) {
         log.info("Запрос информации обо всех отзывах");
