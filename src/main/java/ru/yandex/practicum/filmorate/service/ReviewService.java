@@ -34,22 +34,22 @@ public class ReviewService {
         return updatedReview;
     }
 
-    public void delete(long id) {
+    public void delete(Long id) {
         Review review = reviewStorage.get(id).orElseThrow(() ->
                 new NotFoundException("Отзыв с id = " + id + " не найден"));
         reviewStorage.delete(id);
         eventService.createEvent(review.getUserId(), EventType.REVIEW, EventOperation.REMOVE, review.getReviewId());
     }
 
-    public Review get(long id) {
+    public Review get(Long id) {
         return reviewStorage.get(id).orElseThrow(
                 () -> new NotFoundException("Отзыв с id = " + id + " не найден"));
     }
 
-    public List<Review> getByFilm(long filmId, int count) {
+    public List<Review> getByFilm(Long filmId, int count) {
         List<Review> reviews;
 
-        if (filmId == -1) {
+        if (filmId == null) {
             reviews = reviewStorage.getAll();
         } else {
             reviews = reviewStorage.getByFilm(filmId);
@@ -60,23 +60,23 @@ public class ReviewService {
         return reviews;
     }
 
-    public void addLikeToReview(long reviewId, long userId) {
+    public void addLikeToReview(Long reviewId, Long userId) {
         setUserReaction(reviewId, userId, true);
     }
 
-    public void addDislikeToReview(long reviewId, long userId) {
+    public void addDislikeToReview(Long reviewId, Long userId) {
         setUserReaction(reviewId, userId, false);
     }
 
-    public void deleteLikeToReview(long reviewId, long userId) {
+    public void deleteLikeToReview(Long reviewId, Long userId) {
         clearUserReaction(reviewId, userId, true);
     }
 
-    public void deleteDislikeToReview(long reviewId, long userId) {
+    public void deleteDislikeToReview(Long reviewId, Long userId) {
         clearUserReaction(reviewId, userId, false);
     }
 
-    private void setUserReaction(long reviewId, long userId, boolean isLike) {
+    private void setUserReaction(Long reviewId, Long userId, boolean isLike) {
         checkReviewId(reviewId);
         checkUserId(userId);
         if (isLike) {
@@ -86,7 +86,7 @@ public class ReviewService {
         }
     }
 
-    private void clearUserReaction(long reviewId, long userId, boolean isLike) {
+    private void clearUserReaction(Long reviewId, Long userId, boolean isLike) {
         checkReviewId(reviewId);
         checkUserId(userId);
         if (isLike) {
@@ -106,13 +106,13 @@ public class ReviewService {
         review.setUseful(0L);
     }
 
-    private void checkReviewId(long reviewId) {
+    private void checkReviewId(Long reviewId) {
         if (reviewStorage.get(reviewId).isEmpty()) {
             throw new NotFoundException("Отзыв с id = " + reviewId + " не найден");
         }
     }
 
-    private void checkUserId(long userId) {
+    private void checkUserId(Long userId) {
         if (userService.getUser(userId) == null) {
             throw new NotFoundException("Пользователь с id = " + userId + " не найден");
         }
