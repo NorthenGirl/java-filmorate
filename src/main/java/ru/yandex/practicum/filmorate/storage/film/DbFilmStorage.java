@@ -23,6 +23,7 @@ import java.util.List;
 public class DbFilmStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final FilmMapper filmMapper;
+    private final MultyFilmMapper multyFilmMapper;
 
     @Override
     public List<Film> getRecommendationsForUser(Long userId) {
@@ -243,43 +244,67 @@ public class DbFilmStorage implements FilmStorage {
             count = 10;
         }
         List<Object> params = new ArrayList<>();
-        StringBuilder sqlQuery = new StringBuilder("""
-                SELECT
-                    FLM.FILM_ID,
-                    FLM.NAME,
-                    FLM.DESCRIPTION,
-                    FLM.RELEASEDATE,
-                    FLM.DURATION,
-                    MR.ID AS RATING_ID,
-                    MR.NAME AS RATING_NAME,
-                    G2.ID AS GENRE_ID,
-                    G2.NAME AS GENRE_NAME,
-                    D.ID AS DIRECTOR_ID,
-                    D.NAME AS DIRECTOR_NAME
-                FROM FILMS AS FLM
-                LEFT JOIN MPA_RATING MR ON MR.ID = FLM.RATING_ID
-                LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
-                LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
-                LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
-                LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
-                LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l
-                ON (FLM.FILM_ID = l.FILM_ID) WHERE TRUE\s""");
+        StringBuilder sqlQuery = new StringBuilder(
+        """
+                           SELECT
+                                films.film_id,
+                                films.name,
+                                films.description,
+                                films.releasedate,
+                                films.duration,
+                                mr.id AS rating_id,
+                                mr.name AS rating_name,
+                                genres.id AS genre_id,
+                                genres.name AS genre_name,
+                                d.id AS director_id,
+                                d.name AS director_name
+                            FROM films
+                            LEFT JOIN mpa_rating mr ON mr.id = films.rating_id
+                            LEFT JOIN film_genres fg USING (film_id)
+                            LEFT JOIN genres ON genres.id = fg.genre_id
+                            LEFT JOIN film_directors fd USING(film_id)
+                            LEFT JOIN directors d ON d.id = fd.director_id
+                            LEFT JOIN
+                	(
+                	SELECT film_id, COUNT(user_id) as likes_count
+                	FROM likes
+                	GROUP BY film_id
+                	) l USING (film_id)
+                WHERE
+                    films.film_id IN
+                		(
+                	     SELECT films.film_id
+                            	     FROM films
+                                     LEFT JOIN film_genres fg USING (film_id)
+                                     LEFT JOIN
+                	         (
+                	          SELECT film_id, COUNT(user_id) as likes_count
+                	          FROM likes
+                	          GROUP BY film_id
+                	          ) tl USING (film_id)
+                         WHERE TRUE
+        """);
         if (genreId != null) {
-            sqlQuery.append("""
-                    AND GENRE_ID = ?\s""");
+            sqlQuery.append("AND fg.genre_id = ?");
             params.add(genreId);
         }
         if (year != null) {
-            sqlQuery.append("""
-                    AND EXTRACT(YEAR FROM FLM.RELEASEDATE) = ?\s""");
+            sqlQuery.append("AND EXTRACT(YEAR FROM films.releasedate) = ?");
             params.add(year);
         }
-        sqlQuery.append("""
-                ORDER BY l.likes_count DESC
-                LIMIT ?
-                """);
+        sqlQuery.append("ORDER BY tl.likes_count DESC LIMIT ?)");
         params.add(count);
-        return jdbcTemplate.query(sqlQuery.toString(), filmMapper::mapRow, params.toArray());
+
+        if (genreId != null) {
+            sqlQuery.append("AND genre_id = ?");
+            params.add(genreId);
+        }
+        if (year != null) {
+            sqlQuery.append("AND EXTRACT(YEAR FROM films.releasedate) = ?");
+            params.add(year);
+        }
+        sqlQuery.append("ORDER BY l.likes_count DESC");
+        return jdbcTemplate.query(sqlQuery.toString(), multyFilmMapper, params.toArray());
     }
 
     @Override
