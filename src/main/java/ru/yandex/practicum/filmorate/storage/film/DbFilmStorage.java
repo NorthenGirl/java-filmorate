@@ -398,11 +398,11 @@ public class DbFilmStorage implements FilmStorage {
                 LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
                 LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l
                 ON (FLM.FILM_ID = l.FILM_ID)
-                WHERE D.NAME LIKE ?
-                OR FLM.NAME LIKE ?
+                WHERE LOWER(D.NAME) LIKE CONCAT('%', ? , '%')
+                OR LOWER(FLM.NAME) LIKE CONCAT('%', ? , '%')
                 ORDER BY l.likes_count DESC
                 """;
-        return jdbcTemplate.query(sqlQuery, filmMapper::mapRow, query, query);
+        return jdbcTemplate.query(sqlQuery, filmMapper, query.toLowerCase(), query.toLowerCase());
     }
 
     public List<Film> getFilmsByTitle(String query) {
@@ -427,10 +427,10 @@ public class DbFilmStorage implements FilmStorage {
                 LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
                 LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l
                 ON (FLM.FILM_ID = l.FILM_ID)
-                WHERE FLM.NAME LIKE ?
+                WHERE LOWER(FLM.NAME) LIKE CONCAT('%', ? , '%')
                 ORDER BY l.likes_count DESC
                 """;
-        return jdbcTemplate.query(sqlQuery, filmMapper::mapRow, query);
+        return jdbcTemplate.query(sqlQuery, filmMapper, query.toLowerCase());
     }
 
     public List<Film> getFilmsByDirector(String query) {
@@ -455,10 +455,10 @@ public class DbFilmStorage implements FilmStorage {
                 LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
                 LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l
                 ON (FLM.FILM_ID = l.FILM_ID)
-                WHERE D.NAME LIKE ?
+                WHERE LOWER(D.NAME) LIKE CONCAT('%', ? , '%')
                 ORDER BY l.likes_count DESC
                 """;
-        return jdbcTemplate.query(sqlQuery, filmMapper::mapRow, query);
+        return jdbcTemplate.query(sqlQuery, filmMapper, query.toLowerCase());
     }
 }
 
