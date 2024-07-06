@@ -23,6 +23,7 @@ import java.util.List;
 public class DbFilmStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final FilmMapper filmMapper;
+    private final MultyFilmMapper multyFilmMapper;
 
     @Override
     public List<Film> getRecommendationsForUser(Long userId) {
@@ -303,7 +304,7 @@ public class DbFilmStorage implements FilmStorage {
             params.add(year);
         }
         sqlQuery.append("ORDER BY l.likes_count DESC");
-        return jdbcTemplate.query(sqlQuery.toString(), filmMapper, params.toArray());
+        return jdbcTemplate.query(sqlQuery.toString(), multyFilmMapper, params.toArray());
     }
 
     @Override
