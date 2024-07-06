@@ -105,8 +105,8 @@ public class FilmService {
         likesStorage.deleteLike(userId, filmId);
     }
 
-    public List<Film> getPopularFilms(Integer count) {
-        return filmStorage.getIdPopularFilms(count);
+    public List<Film> getPopularFilms(Integer count, Long genreId, Integer year) {
+        return filmStorage.getIdPopularFilms(count, genreId, year);
     }
 
     public List<Genre> getAllGenres() {
@@ -138,5 +138,25 @@ public class FilmService {
             throw new NotFoundException("Режиссер с id " + directorId + " не найден");
         }
         return filmStorage.getFilmsByDirectorIdSortedByYear(directorId);
+    }
+
+    public void deleteFilm(Long id) {
+        Film film = filmStorage.getFilm(id);
+        if (film == null) {
+            throw new NotFoundException("Фильм с id " + id + " не найден");
+        }
+        filmStorage.delete(id);
+    }
+
+    public List<Film> getFilmsByTitle(String query) {
+        return filmStorage.getFilmsByTitle(query);
+    }
+
+    public List<Film> getFilmsByDirector(String query) {
+        return filmStorage.getFilmsByDirector(query);
+    }
+
+    public List<Film> getFilmsByDirectorAndTitle(String query) {
+        return filmStorage.getFilmsByDirectorAndTitle(query);
     }
 }

@@ -34,4 +34,5 @@ public class DbLikesStorage implements LikesStorage {
             throw new ValidationException("Пользователь с id = " + userId + " уже лайкнул этот фильм");
         }
     }
+
 }
