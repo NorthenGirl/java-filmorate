@@ -55,7 +55,7 @@ public class DbFilmStorage implements FilmStorage {
                       LIMIT 1)
                       AND likes.film_id NOT IN (SELECT likes.film_id FROM likes WHERE likes.user_id=?)
                 """;
-        return jdbcTemplate.query(getRecommendedFilmsQuery, filmMapper, userId, userId, userId);
+        return jdbcTemplate.query(getRecommendedFilmsQuery, multyFilmMapper, userId, userId, userId);
     }
 
     @Override
@@ -245,45 +245,45 @@ public class DbFilmStorage implements FilmStorage {
         }
         List<Object> params = new ArrayList<>();
         StringBuilder sqlQuery = new StringBuilder(
-        """
-                           SELECT
-                                films.film_id,
-                                films.name,
-                                films.description,
-                                films.releasedate,
-                                films.duration,
-                                mr.id AS rating_id,
-                                mr.name AS rating_name,
-                                genres.id AS genre_id,
-                                genres.name AS genre_name,
-                                d.id AS director_id,
-                                d.name AS director_name
-                            FROM films
-                            LEFT JOIN mpa_rating mr ON mr.id = films.rating_id
-                            LEFT JOIN film_genres fg USING (film_id)
-                            LEFT JOIN genres ON genres.id = fg.genre_id
-                            LEFT JOIN film_directors fd USING(film_id)
-                            LEFT JOIN directors d ON d.id = fd.director_id
-                            LEFT JOIN
-                	(
-                	SELECT film_id, COUNT(user_id) as likes_count
-                	FROM likes
-                	GROUP BY film_id
-                	) l USING (film_id)
-                WHERE
-                    films.film_id IN
-                		(
-                	     SELECT films.film_id
-                            	     FROM films
-                                     LEFT JOIN film_genres fg USING (film_id)
-                                     LEFT JOIN
-                	         (
-                	          SELECT film_id, COUNT(user_id) as likes_count
-                	          FROM likes
-                	          GROUP BY film_id
-                	          ) tl USING (film_id)
-                         WHERE TRUE
-        """);
+                """
+                                           SELECT
+                                                films.film_id,
+                                                films.name,
+                                                films.description,
+                                                films.releasedate,
+                                                films.duration,
+                                                mr.id AS rating_id,
+                                                mr.name AS rating_name,
+                                                genres.id AS genre_id,
+                                                genres.name AS genre_name,
+                                                d.id AS director_id,
+                                                d.name AS director_name
+                                            FROM films
+                                            LEFT JOIN mpa_rating mr ON mr.id = films.rating_id
+                                            LEFT JOIN film_genres fg USING (film_id)
+                                            LEFT JOIN genres ON genres.id = fg.genre_id
+                                            LEFT JOIN film_directors fd USING(film_id)
+                                            LEFT JOIN directors d ON d.id = fd.director_id
+                                            LEFT JOIN
+                                	(
+                                	SELECT film_id, COUNT(user_id) as likes_count
+                                	FROM likes
+                                	GROUP BY film_id
+                                	) l USING (film_id)
+                                WHERE
+                                    films.film_id IN
+                                		(
+                                	     SELECT films.film_id
+                                            	     FROM films
+                                                     LEFT JOIN film_genres fg USING (film_id)
+                                                     LEFT JOIN
+                                	         (
+                                	          SELECT film_id, COUNT(user_id) as likes_count
+                                	          FROM likes
+                                	          GROUP BY film_id
+                                	          ) tl USING (film_id)
+                                         WHERE TRUE
+                        """);
         if (genreId != null) {
             sqlQuery.append("AND fg.genre_id = ?");
             params.add(genreId);
