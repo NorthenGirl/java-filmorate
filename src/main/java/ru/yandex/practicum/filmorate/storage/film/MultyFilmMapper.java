@@ -42,21 +42,21 @@ public class MultyFilmMapper implements ResultSetExtractor<List<Film>> {
             }
 
             if (rs.getLong("genre_id") != 0) {
-                Genre genre=Genre.builder()
+                Genre genre = Genre.builder()
                         .id(rs.getLong("genre_id"))
                         .name(rs.getString("genre_name"))
                         .build();
-                if (film.getGenres().isEmpty()||!film.getGenres().contains(genre)) {
+                if (film.getGenres().isEmpty() || !film.getGenres().contains(genre)) {
                     film.getGenres().add(genre);
                 }
             }
 
             if (rs.getLong("director_id") != 0) {
-                Director director=Director.builder()
+                Director director = Director.builder()
                         .id(rs.getLong("director_id"))
                         .name(rs.getString("director_name"))
                         .build();
-                if (film.getDirectors().isEmpty()||!film.getDirectors().contains(director)) {
+                if (film.getDirectors().isEmpty() || !film.getDirectors().contains(director)) {
                     film.getDirectors().add(director);
                 }
             }
