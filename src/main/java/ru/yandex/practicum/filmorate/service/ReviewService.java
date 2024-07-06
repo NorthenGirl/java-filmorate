@@ -97,10 +97,10 @@ public class ReviewService {
     }
 
     private void reviewValidation(Review review) {
-        if (review.getUserId() == null || userService.getUser(review.getUserId()) == null) {
+        if (userService.getUser(review.getUserId()) == null) {
             throw new ValidationException("Данные о пользователе отсутствуют в базе данных");
         }
-        if (review.getFilmId() == null || filmService.getFilm(review.getFilmId()) == null) {
+        if (filmService.getFilm(review.getFilmId()) == null) {
             throw new ValidationException("Данные о фильме отсутствуют в базе данных");
         }
         review.setUseful(0L);
