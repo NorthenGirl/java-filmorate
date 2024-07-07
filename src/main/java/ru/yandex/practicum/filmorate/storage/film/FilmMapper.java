@@ -18,45 +18,45 @@ public class FilmMapper implements RowMapper<Film> {
     private Map<Long, Film> films = new HashMap<>();
 
     public Film mapRow(ResultSet rs, int rowNum) throws SQLException {
-        Long id = rs.getLong("film_id");
+        Long id = rs.getLong("FILM_ID");
         Film film = films.get(id);
         if (film == null) {
             film = Film.builder()
                     .id(id)
-                    .name(rs.getString("name"))
-                    .description(rs.getString("description"))
-                    .releaseDate(rs.getDate("releaseDate").toLocalDate())
-                    .duration(rs.getInt("duration"))
+                    .name(rs.getString("NAME"))
+                    .description(rs.getString("DESCRIPTION"))
+                    .releaseDate(rs.getDate("RELEASEDATE").toLocalDate())
+                    .duration(rs.getInt("DURATION"))
                     .genres(new ArrayList<Genre>())
                     .directors(new ArrayList<Director>())
                     .mpa(MPA.builder()
-                            .id(rs.getLong("rating_id"))
-                            .name(rs.getString("rating_name"))
+                            .id(rs.getLong("RATING_ID"))
+                            .name(rs.getString("RATING_NAME"))
                             .build())
                     .build();
             films.put(id, film);
         }
 
-        if (rs.getLong("genre_id") != 0) {
+        if (rs.getLong("GENRE_ID") != 0) {
             if (!film.getGenres().contains(Genre.builder()
-                    .id(rs.getLong("genre_id"))
-                    .name(rs.getString("genre_name"))
+                    .id(rs.getLong("GENRE_ID"))
+                    .name(rs.getString("GENRE_NAME"))
                     .build())) {
                 film.getGenres().add(Genre.builder()
-                        .id(rs.getLong("genre_id"))
-                        .name(rs.getString("genre_name"))
+                        .id(rs.getLong("GENRE_ID"))
+                        .name(rs.getString("GENRE_NAME"))
                         .build());
             }
         }
 
-        if (rs.getLong("director_id") != 0) {
+        if (rs.getLong("DIRECTOR_ID") != 0) {
             if (!film.getDirectors().contains(Director.builder()
-                    .id(rs.getLong("director_id"))
-                    .name(rs.getString("director_name"))
-                    .build()) || film.getDirectors().size() == 0) {
+                    .id(rs.getLong("DIRECTOR_ID"))
+                    .name(rs.getString("DIRECTOR_NAME"))
+                    .build()) || film.getDirectors().isEmpty()) {
                 film.getDirectors().add(Director.builder()
-                        .id(rs.getLong("director_id"))
-                        .name(rs.getString("director_name"))
+                        .id(rs.getLong("DIRECTOR_ID"))
+                        .name(rs.getString("DIRECTOR_NAME"))
                         .build());
             }
         }
