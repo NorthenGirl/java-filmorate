@@ -274,19 +274,18 @@ public class DbFilmStorage implements FilmStorage {
             sqlQuery.append("AND EXTRACT(YEAR FROM FLM.RELEASEDATE) = ?");
             params.add(year);
         }
+        if (genreId != null) {
+            sqlQuery.append(
+                "AND EXISTS (SELECT FILM_ID FROM FILM_GENRES F2 WHERE FLM.FILM_ID = F2.FILM_ID AND GENRE_ID = ?)");
+            params.add(genreId);
+        }
         sqlQuery.append("""
             ORDER BY likes_count DESC
                         LIMIT ?
             	) F
             LEFT JOIN FILM_GENRES FG ON F.FILM_ID = FG.FILM_ID
-            LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
-            WHERE TRUE\s""");
+            LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID\s""");
         params.add(count);
-        if (genreId != null) {
-            sqlQuery.append(
-                "AND EXISTS (SELECT FILM_ID FROM FILM_GENRES F2 WHERE F.FILM_ID = F2.FILM_ID AND GENRE_ID = ?)");
-            params.add(genreId);
-        }
         return jdbcTemplate.query(sqlQuery.toString(), multyFilmMapper, params.toArray());
     }
 
