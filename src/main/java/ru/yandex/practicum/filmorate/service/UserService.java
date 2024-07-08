@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.EventOperation;
@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
     private final FriendsStorage friendsStorage;
