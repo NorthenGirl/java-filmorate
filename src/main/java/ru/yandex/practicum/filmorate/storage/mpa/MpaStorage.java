@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.genre_mpa;
+package ru.yandex.practicum.filmorate.storage.mpa;
 
 import ru.yandex.practicum.filmorate.model.MPA;
 
