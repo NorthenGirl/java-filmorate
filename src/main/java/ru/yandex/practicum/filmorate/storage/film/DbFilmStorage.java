@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.mapper.FilmMapper;
 import ru.yandex.practicum.filmorate.mapper.MultyFilmMapper;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -24,7 +23,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DbFilmStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
-    private final FilmMapper filmMapper;
     private final MultyFilmMapper multyFilmMapper;
 
     @Override
@@ -94,7 +92,7 @@ public class DbFilmStorage implements FilmStorage {
                 )
                 ORDER BY l.likes_count DESC
                 """;
-        return jdbcTemplate.query(getCommonSortedByLikesQuery, filmMapper, userId, friendId);
+        return jdbcTemplate.query(getCommonSortedByLikesQuery, multyFilmMapper, userId, friendId);
     }
 
     private void throwIfUserIsAbsent(Long userId) {
@@ -132,11 +130,8 @@ public class DbFilmStorage implements FilmStorage {
                 LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
                 LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
                 LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
-
                 """;
-        List<Film> films = jdbcTemplate.query(sqlQery, filmMapper::mapRow);
-
-        return films;
+        return jdbcTemplate.query(sqlQery, multyFilmMapper);
     }
 
     @Override
@@ -233,8 +228,8 @@ public class DbFilmStorage implements FilmStorage {
                 LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
                 WHERE FLM.FILM_ID = ?
                 """;
-        List<Film> films = jdbcTemplate.query(sqlQuery, filmMapper::mapRow, id);
-        if (films.isEmpty()) {
+        List<Film> films = jdbcTemplate.query(sqlQuery, multyFilmMapper, id);
+        if (films == null || films.isEmpty()) {
             throw new NotFoundException("Фильм с  id=" + id + "не найден");
         }
         return films.get(0);
@@ -327,7 +322,7 @@ public class DbFilmStorage implements FilmStorage {
                 GROUP BY FLM.film_id
                 ORDER BY L.likes_count DESC
                 """;
-        return jdbcTemplate.query(sqlQuery, filmMapper::mapRow, directorId);
+        return jdbcTemplate.query(sqlQuery, multyFilmMapper, directorId);
     }
 
     @Override
@@ -355,7 +350,7 @@ public class DbFilmStorage implements FilmStorage {
                 GROUP BY FLM.film_id
                 ORDER BY EXTRACT(YEAR FROM FLM.releaseDate)
                 """;
-        List<Film> films = jdbcTemplate.query(sqlQuery, filmMapper::mapRow, directorId);
+        List<Film> films = jdbcTemplate.query(sqlQuery, multyFilmMapper, directorId);
         return films;
     }
 
@@ -395,7 +390,7 @@ public class DbFilmStorage implements FilmStorage {
                 OR LOWER(FLM.NAME) LIKE CONCAT('%', ? , '%')
                 ORDER BY l.likes_count DESC
                 """;
-        return jdbcTemplate.query(sqlQuery, filmMapper, query.toLowerCase(), query.toLowerCase());
+        return jdbcTemplate.query(sqlQuery, multyFilmMapper, query.toLowerCase(), query.toLowerCase());
     }
 
     public List<Film> getFilmsByTitle(String query) {
@@ -423,7 +418,7 @@ public class DbFilmStorage implements FilmStorage {
                 WHERE LOWER(FLM.NAME) LIKE CONCAT('%', ? , '%')
                 ORDER BY l.likes_count DESC
                 """;
-        return jdbcTemplate.query(sqlQuery, filmMapper, query.toLowerCase());
+        return jdbcTemplate.query(sqlQuery, multyFilmMapper, query.toLowerCase());
     }
 
     public List<Film> getFilmsByDirector(String query) {
@@ -451,7 +446,7 @@ public class DbFilmStorage implements FilmStorage {
                 WHERE LOWER(D.NAME) LIKE CONCAT('%', ? , '%')
                 ORDER BY l.likes_count DESC
                 """;
-        return jdbcTemplate.query(sqlQuery, filmMapper, query.toLowerCase());
+        return jdbcTemplate.query(sqlQuery, multyFilmMapper, query.toLowerCase());
     }
 }
 

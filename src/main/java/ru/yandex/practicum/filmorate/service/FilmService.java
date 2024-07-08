@@ -38,11 +38,7 @@ public class FilmService {
 
 
     public Collection<Film> findAll() {
-        Set<Long> ids = filmStorage.findAll().stream().map(Film::getId).collect(Collectors.toSet());
-        ArrayList<Film> films = new ArrayList<>();
-        ids.stream()
-                .forEach(id -> films.add(filmStorage.getFilm(id)));
-        return films;
+        return filmStorage.findAll();
     }
 
     public Film create(Film film) {
