@@ -3,7 +3,11 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.EventOperation;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.friends.FriendsStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -15,12 +19,24 @@ import java.util.List;
 public class UserService {
     private final UserStorage userStorage;
     private final FriendsStorage friendsStorage;
+    private final FilmStorage filmStorage;
+    private final EventService eventService;
+
+    public Collection<Film> getRecommendationsForUser(Long userId) {
+        if (userStorage.getUser(userId) == null) {
+            throw new NotFoundException("Пользователь с  id = " + userId + " не найден");
+        }
+        return filmStorage.getRecommendationsForUser(userId);
+    }
 
     public Collection<User> findAll() {
         return userStorage.findAll();
     }
 
     public User create(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
         return userStorage.create(user);
     }
 
@@ -36,6 +52,7 @@ public class UserService {
             throw new NotFoundException("Друг с  id = " + friendId + " не найден");
         }
         friendsStorage.addFriend(userId, friendId);
+        eventService.createEvent(userId, EventType.FRIEND, EventOperation.ADD, friendId);
     }
 
     public void deleteFriend(Long userId, Long friendId) {
@@ -46,6 +63,7 @@ public class UserService {
             throw new NotFoundException("У пользователя с id = " + userId + " не друга с  id = " + friendId);
         }
         friendsStorage.deleteFriend(userId, friendId);
+        eventService.createEvent(userId, EventType.FRIEND, EventOperation.REMOVE, friendId);
     }
 
     public List<User> getFriends(Long userId) {
@@ -67,5 +85,9 @@ public class UserService {
 
     public User getUser(Long id) {
         return userStorage.getUser(id);
+    }
+
+    public long deleteUser(long id) {
+        return userStorage.delete(id);
     }
 }

@@ -33,16 +33,6 @@ public class DbGenreStorage implements GenreStorage {
     }
 
     @Override
-    public Genre getFromFilm(Long filmId) {
-        try {
-            String sqlQuery = "SELECT * FROM genres WHERE id IN (SELECT genre_id FROM films WHERE film_id = ?)";
-            return jdbcTemplate.queryForObject(sqlQuery, new DataClassRowMapper<>(Genre.class), filmId);
-        } catch (EmptyResultDataAccessException exception) {
-            return null;
-        }
-    }
-
-    @Override
     public void genreValidate(List<Genre> genres) {
         for (Genre genre : genres) {
             if ((jdbcTemplate.query("SELECT * FROM genres WHERE id = ?", new DataClassRowMapper<>(Genre.class), genre.getId())).isEmpty()) {
@@ -50,4 +40,5 @@ public class DbGenreStorage implements GenreStorage {
             }
         }
     }
+
 }

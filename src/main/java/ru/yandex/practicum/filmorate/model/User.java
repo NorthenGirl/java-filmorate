@@ -5,18 +5,20 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import ru.yandex.practicum.filmorate.annotations.NotSpase;
 
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
-@Builder
-@AllArgsConstructor
+@Getter
+@Setter
 @RequiredArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
     private Long id;
     @NotBlank
