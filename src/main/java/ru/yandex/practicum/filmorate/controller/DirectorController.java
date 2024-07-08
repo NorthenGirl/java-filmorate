@@ -23,7 +23,7 @@ import java.util.Collection;
 @AllArgsConstructor
 @RequestMapping("/directors")
 public class DirectorController {
-    private  final DirectorService directorService;
+    private final DirectorService directorService;
 
     @GetMapping
     public Collection<Director> getAll() {
