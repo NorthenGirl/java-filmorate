@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.genre_mpa;
+package ru.yandex.practicum.filmorate.storage.genre;
 
 import ru.yandex.practicum.filmorate.model.Genre;
 
@@ -10,4 +10,5 @@ public interface GenreStorage {
     List<Genre> getAll();
 
     void genreValidate(List<Genre> genres);
+
 }

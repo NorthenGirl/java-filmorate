@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -20,6 +21,7 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @JdbcTest
 @AutoConfigureTestDatabase
@@ -31,6 +33,17 @@ public class DbFilmStorageTest {
     private final LikesStorage likesStorage;
     private final DirectorStorage directorStorage;
 
+
+    @Test
+    @DisplayName("get common films for 2 users")
+    @Sql(scripts = {"/test-get-common.sql"})
+    void getCommonFilmsTest() {
+        List<Film> commonFilms = filmStorage.getCommonFilms(1L, 2L);
+        assertEquals(2, commonFilms.size());
+        assertTrue(commonFilms.stream().anyMatch(f -> f.getId() == 3));
+        assertTrue(commonFilms.stream().anyMatch(f -> f.getId() == 4));
+    }
+
     @Test
     @Sql(scripts = {"/test-get-enums.sql"})
     void createFilm() {
@@ -39,7 +52,7 @@ public class DbFilmStorageTest {
                 "description",
                 LocalDate.of(2024, 4, 17),
                 200,
-                new MPA(1L, "G")
+                MPA.builder().id(1L).name("G").build()
         ));
 
         Film film = filmStorage.getFilm(1L);
@@ -60,7 +73,7 @@ public class DbFilmStorageTest {
                 "new_description1",
                 LocalDate.of(2024, 4, 17),
                 90,
-                new MPA(3L, "PG"),
+                MPA.builder().id(3L).name("PG").build(),
                 new ArrayList<>(),
                 new ArrayList<>()
         ));

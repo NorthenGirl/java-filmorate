@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.mapper.MultyFilmMapper;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -16,11 +19,94 @@ import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.List;
 
+@Repository
 @RequiredArgsConstructor
-@Component
 public class DbFilmStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
-    private final FilmMapper filmMapper;
+    private final MultyFilmMapper multyFilmMapper;
+
+    @Override
+    public List<Film> getRecommendationsForUser(Long userId) {
+        String getRecommendedFilmsQuery = """
+                SELECT likes.film_id,
+                       flm.name,
+                       flm.description,
+                       flm.releasedate,
+                       flm.duration,
+                       mr.id AS rating_id,
+                       mr.name AS rating_name,
+                       g2.id AS genre_id,
+                       g2.name AS genre_name,
+                       d.id AS director_id,
+                       d.name AS director_name
+                FROM likes
+                JOIN films AS flm ON likes.film_id=flm.film_id
+                LEFT JOIN mpa_rating mr ON mr.id = flm.rating_id
+                LEFT JOIN film_genres fg ON flm.film_id = fg.film_id
+                LEFT JOIN genres g2 ON g2.id = fg.genre_id
+                LEFT JOIN film_directors fd ON flm.film_id = fd.film_id
+                LEFT JOIN directors d ON d.id = fd.director_id
+                WHERE likes.user_id IN (
+                      SELECT likes.user_id
+                      FROM likes
+                      WHERE likes.film_id IN (SELECT likes.film_id FROM likes WHERE likes.user_id=?) AND likes.user_id<>?
+                      GROUP BY likes.user_id
+                      ORDER BY COUNT(*) DESC
+                      LIMIT 1)
+                      AND likes.film_id NOT IN (SELECT likes.film_id FROM likes WHERE likes.user_id=?)
+                """;
+        return jdbcTemplate.query(getRecommendedFilmsQuery, multyFilmMapper, userId, userId, userId);
+    }
+
+    @Override
+    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        throwIfUserIsAbsent(userId);
+        throwIfUserIsAbsent(friendId);
+        String getCommonSortedByLikesQuery = """
+                SELECT
+                  flm.film_id,
+                  flm.name,
+                  flm.description,
+                  flm.releasedate,
+                  flm.duration,
+                  mr.id AS rating_id,
+                  mr.name AS rating_name,
+                  g2.id AS genre_id,
+                  g2.name AS genre_name,
+                  d.id AS director_id,
+                  d.name AS director_name
+                FROM films AS flm
+                  LEFT JOIN mpa_rating mr ON mr.id = flm.rating_id
+                  LEFT JOIN film_genres fg ON flm.film_id = fg.film_id
+                  LEFT JOIN genres g2 ON g2.id = fg.genre_id
+                  LEFT JOIN film_directors fd ON flm.film_id = fd.film_id
+                  LEFT JOIN directors d ON d.id = fd.director_id
+                  LEFT JOIN (
+                	 SELECT film_id, COUNT(user_id) as likes_count FROM likes GROUP BY film_id) l
+                	 ON (flm.film_id = l.film_id)
+                WHERE flm.film_id IN (
+                	 SELECT likes.film_id FROM likes WHERE likes.user_id=?
+                	 INTERSECT
+                	 SELECT likes.film_id FROM likes WHERE likes.user_id=?
+                )
+                ORDER BY l.likes_count DESC
+                """;
+        return jdbcTemplate.query(getCommonSortedByLikesQuery, multyFilmMapper, userId, friendId);
+    }
+
+    private void throwIfUserIsAbsent(Long userId) {
+        String userCount = """
+                SELECT COUNT(*)
+                FROM Users
+                WHERE id=?
+                """;
+        int result = jdbcTemplate.queryForObject(userCount, Integer.class, userId);
+        if (result == 0) {
+            throw new NotFoundException("Пользователь с  id = " + userId + " не найден");
+        }
+    }
+
 
     @Override
     public List<Film> findAll() {
@@ -44,16 +130,14 @@ public class DbFilmStorage implements FilmStorage {
                 LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
                 LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
                 LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
-
                 """;
-        List<Film> films = jdbcTemplate.query(sqlQery, filmMapper::mapRow);
-
-        return films;
+        return jdbcTemplate.query(sqlQery, multyFilmMapper);
     }
 
     @Override
     public Film create(Film film) {
-        String sqlQuery = "INSERT INTO films (name, description, releaseDate, duration, rating_id) values (?, ?, ?, ?, ?)";
+        String sqlQuery =
+                "INSERT INTO films (name, description, releaseDate, duration, rating_id) values (?, ?, ?, ?, ?)";
 
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -70,8 +154,7 @@ public class DbFilmStorage implements FilmStorage {
             List<Genre> genres = new ArrayList<>(film.getGenres());
             for (Genre genre : genres) {
                 if (genre.getId() != null) {
-                    jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id)values(?,?)", +
-                            film.getId(), genre.getId());
+                    jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id)values(?,?)", +film.getId(), genre.getId());
                 }
             }
         }
@@ -79,8 +162,7 @@ public class DbFilmStorage implements FilmStorage {
             List<Director> directors = new ArrayList<>(film.getDirectors());
             for (Director director : directors) {
                 if (director.getId() != null) {
-                    jdbcTemplate.update("INSERT INTO film_directors (film_id, director_id) values (?, ?)", +
-                            film.getId(), director.getId());
+                    jdbcTemplate.update("INSERT INTO film_directors (film_id, director_id) values (?, ?)", +film.getId(), director.getId());
                 }
             }
         }
@@ -90,24 +172,14 @@ public class DbFilmStorage implements FilmStorage {
     @Override
     public Film update(Film film) {
         updateValidate(film);
-        String sqlQuery = "update films SET name = ?, description = ?, releaseDate = ?, duration = ?, rating_id = ?" +
-                " WHERE film_id = ?";
-        jdbcTemplate.update(
-                sqlQuery,
-                film.getName(),
-                film.getDescription(),
-                film.getReleaseDate(),
-                film.getDuration(),
-                film.getMpa().getId(),
-                film.getId()
-        );
+        String sqlQuery = "update films SET name = ?, description = ?, releaseDate = ?, duration = ?, rating_id = ?" + " WHERE film_id = ?";
+        jdbcTemplate.update(sqlQuery, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpa().getId(), film.getId());
         jdbcTemplate.update("DELETE FROM film_genres WHERE film_id = ?", film.getId());
         if (!film.getGenres().isEmpty()) {
             List<Genre> genres = new ArrayList<>(film.getGenres());
             for (Genre genre : genres) {
                 if (genre.getId() != null) {
-                    jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id) values(?,?)", +
-                            film.getId(), genre.getId());
+                    jdbcTemplate.update("INSERT INTO film_genres (film_id, genre_id) values(?,?)", +film.getId(), genre.getId());
                 }
             }
         }
@@ -116,7 +188,8 @@ public class DbFilmStorage implements FilmStorage {
             List<Director> directors = new ArrayList<>(film.getDirectors());
             for (Director director : directors) {
                 if (director.getId() != null) {
-                    jdbcTemplate.update("INSERT INTO film_directors (film_id, director_id) values (?, ?)", film.getId(), director.getId());
+                    jdbcTemplate.update("INSERT INTO film_directors (film_id, director_id) values (?, ?)", film.getId(),
+                            director.getId());
                 }
             }
 
@@ -126,8 +199,11 @@ public class DbFilmStorage implements FilmStorage {
 
     @Override
     public void delete(Long id) {
-        String sqlQuery = "delete from films WHERE film_id = ?";
-        jdbcTemplate.update(sqlQuery, id);
+        String sqlQuery = "DELETE FROM films WHERE film_id = ?";
+        int rowsAffected = jdbcTemplate.update(sqlQuery, id);
+        if (rowsAffected == 0) {
+            throw new NotFoundException("Фильм с id " + id + " не найден");
+        }
     }
 
     public Film getFilm(Long id) {
@@ -152,45 +228,71 @@ public class DbFilmStorage implements FilmStorage {
                 LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
                 WHERE FLM.FILM_ID = ?
                 """;
-        List<Film> films = jdbcTemplate.query(sqlQuery, filmMapper::mapRow, id);
-        if (films.isEmpty()) {
+        List<Film> films = jdbcTemplate.query(sqlQuery, multyFilmMapper, id);
+        if (films == null || films.isEmpty()) {
             throw new NotFoundException("Фильм с  id=" + id + "не найден");
         }
         return films.get(0);
     }
 
     @Override
-    public List<Film> getIdPopularFilms(Integer count) {
+    public List<Film> getIdPopularFilms(Integer count, Long genreId, Integer year) {
         if (count == null) {
             count = 10;
         }
-        String sqlQuery = """
-                SELECT
-                    FLM.FILM_ID,
-                    FLM.NAME,
-                    FLM.DESCRIPTION,
-                    FLM.RELEASEDATE,
-                    FLM.DURATION,
-                    MR.ID AS RATING_ID,
-                    MR.NAME AS RATING_NAME,
-                    G2.ID AS GENRE_ID,
-                    G2.NAME AS GENRE_NAME,
-                    D.ID AS DIRECTOR_ID,
-                    D.NAME AS DIRECTOR_NAME
-                FROM FILMS AS FLM
-                LEFT JOIN MPA_RATING MR ON MR.ID = FLM.RATING_ID
-                LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
-                LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
-                LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
-                LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
-                LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l
-                ON (FLM.FILM_ID = l.FILM_ID)
-                ORDER BY l.likes_count DESC
-                LIMIT ?
-                """;
+        List<Object> params = new ArrayList<>();
+        StringBuilder sqlQuery = new StringBuilder(
+                """
+                        SELECT
+                              films.film_id,
+                              films.name,
+                              films.description,
+                              films.releasedate,
+                              films.duration,
+                              mr.id AS rating_id,
+                              mr.name AS rating_name,
+                              genres.id AS genre_id,
+                              genres.name AS genre_name,
+                              d.id AS director_id,
+                              d.name AS director_name
+                        FROM films
+                        LEFT JOIN mpa_rating mr ON mr.id = films.rating_id
+                        LEFT JOIN film_genres fg USING (film_id)
+                        LEFT JOIN genres ON genres.id = fg.genre_id
+                        LEFT JOIN film_directors fd USING(film_id)
+                        LEFT JOIN directors d ON d.id = fd.director_id
+                        LEFT JOIN
+                              	(
+                               	SELECT film_id, COUNT(user_id) as likes_count
+                               	FROM likes
+                               	GROUP BY film_id
+                               	) l USING (film_id)
+                        WHERE films.film_id IN
+                              		(
+                               	     SELECT films.film_id
+                                     FROM films
+                                     LEFT JOIN film_genres fg USING (film_id)
+                                     LEFT JOIN
+                                	         (
+                                	          SELECT film_id, COUNT(user_id) as likes_count
+                                	          FROM likes
+                                	          GROUP BY film_id
+                                	          ) tl USING (film_id)
+                                     WHERE TRUE
+                        """);
+        if (genreId != null) {
+            sqlQuery.append("AND fg.genre_id = ?");
+            params.add(genreId);
+        }
+        if (year != null) {
+            sqlQuery.append("AND EXTRACT(YEAR FROM films.releasedate) = ?");
+            params.add(year);
+        }
+        sqlQuery.append("ORDER BY tl.likes_count DESC LIMIT ?)");
+        params.add(count);
 
-        List<Film> films = jdbcTemplate.query(sqlQuery, filmMapper::mapRow, count);
-        return films;
+        sqlQuery.append("ORDER BY l.likes_count DESC");
+        return jdbcTemplate.query(sqlQuery.toString(), multyFilmMapper, params.toArray());
     }
 
     @Override
@@ -220,7 +322,7 @@ public class DbFilmStorage implements FilmStorage {
                 GROUP BY FLM.film_id
                 ORDER BY L.likes_count DESC
                 """;
-        return jdbcTemplate.query(sqlQuery, filmMapper::mapRow, directorId);
+        return jdbcTemplate.query(sqlQuery, multyFilmMapper, directorId);
     }
 
     @Override
@@ -248,7 +350,7 @@ public class DbFilmStorage implements FilmStorage {
                 GROUP BY FLM.film_id
                 ORDER BY EXTRACT(YEAR FROM FLM.releaseDate)
                 """;
-        List<Film> films = jdbcTemplate.query(sqlQuery, filmMapper::mapRow, directorId);
+        List<Film> films = jdbcTemplate.query(sqlQuery, multyFilmMapper, directorId);
         return films;
     }
 
@@ -260,6 +362,91 @@ public class DbFilmStorage implements FilmStorage {
         if (getFilm(film.getId()) == null) {
             throw new NotFoundException("Фильм с id " + film.getId() + " не найден");
         }
+    }
+
+    public List<Film> getFilmsByDirectorAndTitle(String query) {
+        String sqlQuery = """
+                SELECT
+                    FLM.FILM_ID,
+                    FLM.NAME,
+                    FLM.DESCRIPTION,
+                    FLM.RELEASEDATE,
+                    FLM.DURATION,
+                    MR.ID AS RATING_ID,
+                    MR.NAME AS RATING_NAME,
+                    G2.ID AS GENRE_ID,
+                    G2.NAME AS GENRE_NAME,
+                    D.ID AS DIRECTOR_ID,
+                    D.NAME AS DIRECTOR_NAME
+                FROM FILMS AS FLM
+                LEFT JOIN MPA_RATING MR ON MR.ID = FLM.RATING_ID
+                LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
+                LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
+                LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
+                LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
+                LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l
+                ON (FLM.FILM_ID = l.FILM_ID)
+                WHERE LOWER(D.NAME) LIKE CONCAT('%', ? , '%')
+                OR LOWER(FLM.NAME) LIKE CONCAT('%', ? , '%')
+                ORDER BY l.likes_count DESC
+                """;
+        return jdbcTemplate.query(sqlQuery, multyFilmMapper, query.toLowerCase(), query.toLowerCase());
+    }
+
+    public List<Film> getFilmsByTitle(String query) {
+        String sqlQuery = """
+                SELECT
+                    FLM.FILM_ID,
+                    FLM.NAME,
+                    FLM.DESCRIPTION,
+                    FLM.RELEASEDATE,
+                    FLM.DURATION,
+                    MR.ID AS RATING_ID,
+                    MR.NAME AS RATING_NAME,
+                    G2.ID AS GENRE_ID,
+                    G2.NAME AS GENRE_NAME,
+                    D.ID AS DIRECTOR_ID,
+                    D.NAME AS DIRECTOR_NAME
+                FROM FILMS AS FLM
+                LEFT JOIN MPA_RATING MR ON MR.ID = FLM.RATING_ID
+                LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
+                LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
+                LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
+                LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
+                LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l
+                ON (FLM.FILM_ID = l.FILM_ID)
+                WHERE LOWER(FLM.NAME) LIKE CONCAT('%', ? , '%')
+                ORDER BY l.likes_count DESC
+                """;
+        return jdbcTemplate.query(sqlQuery, multyFilmMapper, query.toLowerCase());
+    }
+
+    public List<Film> getFilmsByDirector(String query) {
+        String sqlQuery = """
+                SELECT
+                    FLM.FILM_ID,
+                    FLM.NAME,
+                    FLM.DESCRIPTION,
+                    FLM.RELEASEDATE,
+                    FLM.DURATION,
+                    MR.ID AS RATING_ID,
+                    MR.NAME AS RATING_NAME,
+                    G2.ID AS GENRE_ID,
+                    G2.NAME AS GENRE_NAME,
+                    D.ID AS DIRECTOR_ID,
+                    D.NAME AS DIRECTOR_NAME
+                FROM FILMS AS FLM
+                LEFT JOIN MPA_RATING MR ON MR.ID = FLM.RATING_ID
+                LEFT JOIN FILM_GENRES FG ON FLM.FILM_ID = FG.FILM_ID
+                LEFT JOIN GENRES G2 ON G2.ID = FG.GENRE_ID
+                LEFT JOIN FILM_DIRECTORS FD ON FLM.FILM_ID = FD.FILM_ID
+                LEFT JOIN DIRECTORS D ON D.ID = FD.DIRECTOR_ID
+                LEFT JOIN (SELECT film_id, COUNT(user_id) as likes_count FROM LIKES GROUP BY film_id) l
+                ON (FLM.FILM_ID = l.FILM_ID)
+                WHERE LOWER(D.NAME) LIKE CONCAT('%', ? , '%')
+                ORDER BY l.likes_count DESC
+                """;
+        return jdbcTemplate.query(sqlQuery, multyFilmMapper, query.toLowerCase());
     }
 }
 

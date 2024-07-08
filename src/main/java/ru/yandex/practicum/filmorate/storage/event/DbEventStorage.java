@@ -1,0 +1,45 @@
+package ru.yandex.practicum.filmorate.storage.event;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.mapper.EventMapper;
+import ru.yandex.practicum.filmorate.model.Event;
+
+import java.util.List;
+
+@Repository
+@RequiredArgsConstructor
+public class DbEventStorage implements EventStorage {
+    private final JdbcTemplate jdbcTemplate;
+    private final EventMapper eventMapper;
+
+    @Override
+    public List<Event> getFeed(long userId) {
+        String sqlQuery = """
+                SELECT event_id, user_id, timestamp, event_type, operation, entity_id
+                FROM feed
+                WHERE user_id = ?
+                """;
+
+        return jdbcTemplate.query(sqlQuery, eventMapper, userId);
+    }
+
+    @Override
+    public void createEvent(Event event) {
+        String sqlQuery = """
+               INSERT INTO feed (
+               user_id, timestamp, event_type, operation, entity_id
+               ) VALUES (?, ?, ?, ?, ?)
+               """;
+
+        jdbcTemplate.update(
+                sqlQuery,
+                event.getUserId(),
+                event.getTimestamp(),
+                event.getEventType().name(),
+                event.getOperation().name(),
+                event.getEntityId()
+        );
+    }
+}

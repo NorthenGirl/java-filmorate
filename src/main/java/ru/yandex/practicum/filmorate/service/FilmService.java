@@ -1,16 +1,17 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.model.EventOperation;
+import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.storage.director.DbDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.genre_mpa.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.genre_mpa.MpaStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.likes.LikesStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -21,7 +22,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
@@ -30,13 +30,15 @@ public class FilmService {
     private final MpaStorage mpaStorage;
     private final UserStorage userStorage;
     private final DbDirectorStorage directorStorage;
+    private final EventService eventService;
+
+    public Collection<Film> getCommonFilms(Long userId, Long friendId) {
+        return filmStorage.getCommonFilms(userId, friendId);
+    }
+
 
     public Collection<Film> findAll() {
-        Set<Long> ids = filmStorage.findAll().stream().map(Film::getId).collect(Collectors.toSet());
-        ArrayList<Film> films = new ArrayList<>();
-        ids.stream()
-                .forEach(id -> films.add(filmStorage.getFilm(id)));
-        return films;
+        return filmStorage.findAll();
     }
 
     public Film create(Film film) {
@@ -88,6 +90,7 @@ public class FilmService {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
         likesStorage.addLike(userId, filmId);
+        eventService.createEvent(userId, EventType.LIKE, EventOperation.ADD, filmId);
     }
 
     public void deleteLike(Long filmId, Long userId) {
@@ -97,11 +100,12 @@ public class FilmService {
         if (userStorage.getUser(userId) == null) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
-        likesStorage.deleteLike(filmId, userId);
+        likesStorage.deleteLike(userId, filmId);
+        eventService.createEvent(userId, EventType.LIKE, EventOperation.REMOVE, filmId);
     }
 
-    public List<Film> getPopularFilms(Integer count) {
-        return filmStorage.getIdPopularFilms(count);
+    public List<Film> getPopularFilms(Integer count, Long genreId, Integer year) {
+        return filmStorage.getIdPopularFilms(count, genreId, year);
     }
 
     public List<Genre> getAllGenres() {
@@ -133,5 +137,25 @@ public class FilmService {
             throw new NotFoundException("Режиссер с id " + directorId + " не найден");
         }
         return filmStorage.getFilmsByDirectorIdSortedByYear(directorId);
+    }
+
+    public void deleteFilm(Long id) {
+        Film film = filmStorage.getFilm(id);
+        if (film == null) {
+            throw new NotFoundException("Фильм с id " + id + " не найден");
+        }
+        filmStorage.delete(id);
+    }
+
+    public List<Film> getFilmsByTitle(String query) {
+        return filmStorage.getFilmsByTitle(query);
+    }
+
+    public List<Film> getFilmsByDirector(String query) {
+        return filmStorage.getFilmsByDirector(query);
+    }
+
+    public List<Film> getFilmsByDirectorAndTitle(String query) {
+        return filmStorage.getFilmsByDirectorAndTitle(query);
     }
 }
