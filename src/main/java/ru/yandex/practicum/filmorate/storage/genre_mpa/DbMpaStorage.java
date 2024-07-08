@@ -5,14 +5,15 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.MPA;
 
 import java.util.List;
 
+@Repository
 @RequiredArgsConstructor
-@Component
 public class DbMpaStorage implements MpaStorage {
     private final JdbcTemplate jdbcTemplate;
 

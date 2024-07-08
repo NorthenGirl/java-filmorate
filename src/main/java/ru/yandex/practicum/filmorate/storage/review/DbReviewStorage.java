@@ -5,6 +5,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.mapper.ReviewMapper;
 import ru.yandex.practicum.filmorate.mapper.ReviewRatingMapper;
 import ru.yandex.practicum.filmorate.model.Review;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-@Component
+@Repository
 @RequiredArgsConstructor
 public class DbReviewStorage implements ReviewStorage {
     private final JdbcTemplate jdbcTemplate;
