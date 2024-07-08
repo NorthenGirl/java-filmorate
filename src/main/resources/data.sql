@@ -16,4 +16,3 @@ merge into MPA_RATING (id, name)
 merge into friendship_status (status_id, name)
     VALUES (1, 'Заявка на добавление в друзья подтверждена'),
     (2, 'Заявка на добавление в друзья не подтверждена');
-

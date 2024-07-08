@@ -37,12 +37,12 @@ public class UserController {
     }
 
     @GetMapping("/{id}/recommendations")
-    @ResponseStatus(HttpStatus.OK)
     public Collection<Film> getRecommendationsForUser(@PathVariable("id") @Positive Long userId) {
         return userService.getRecommendationsForUser(userId);
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public User create(@Valid @RequestBody User user) {
         log.info("Пользователь создан");
         return userService.create(user);
