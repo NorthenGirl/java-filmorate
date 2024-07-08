@@ -5,5 +5,5 @@ import org.hibernate.sql.Update;
 
 public abstract class StorageData {
     @NotNull(groups = {Update.class})
-    Long id;
+    private Long id;
 }
