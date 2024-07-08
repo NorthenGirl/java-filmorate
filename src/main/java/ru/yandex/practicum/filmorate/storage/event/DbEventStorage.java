@@ -2,13 +2,13 @@ package ru.yandex.practicum.filmorate.storage.event;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.mapper.EventMapper;
 import ru.yandex.practicum.filmorate.model.Event;
 
 import java.util.List;
 
-@Component
+@Repository
 @RequiredArgsConstructor
 public class DbEventStorage implements EventStorage {
     private final JdbcTemplate jdbcTemplate;

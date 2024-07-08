@@ -3,15 +3,15 @@ package ru.yandex.practicum.filmorate.storage.friends;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Friendship;
 
 import java.util.List;
 
+@Repository
 @RequiredArgsConstructor
-@Component
 public class DbFrendshipStorage implements FriendshipStorage {
     private final JdbcTemplate jdbcTemplate;
 

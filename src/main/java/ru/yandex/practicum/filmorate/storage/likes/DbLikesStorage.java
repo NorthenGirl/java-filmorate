@@ -7,8 +7,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 
-@RequiredArgsConstructor
 @Repository
+@RequiredArgsConstructor
 @Slf4j
 public class DbLikesStorage implements LikesStorage {
     private final JdbcTemplate jdbcTemplate;

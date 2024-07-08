@@ -1,18 +1,18 @@
 package ru.yandex.practicum.filmorate.storage.genre_mpa;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
 
-@Component
-@AllArgsConstructor
+@Repository
+@RequiredArgsConstructor
 public class DbGenreStorage implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
