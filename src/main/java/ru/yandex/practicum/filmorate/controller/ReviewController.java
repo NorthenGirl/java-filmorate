@@ -64,7 +64,6 @@ public class ReviewController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    @ResponseStatus(HttpStatus.CREATED)
     public void addLikeToReview(@PathVariable("id") long reviewId, @PathVariable("userId") long userId) {
         log.info("Запрос на добавление лайка к отзыву c id = {} от пользователя с id = {}", reviewId, userId);
         reviewService.addLikeToReview(reviewId, userId);
@@ -72,7 +71,6 @@ public class ReviewController {
     }
 
     @PutMapping("/{id}/dislike/{userId}")
-    @ResponseStatus(HttpStatus.CREATED)
     public void addDislikeToReview(@PathVariable("id") long reviewId, @PathVariable("userId") long userId) {
         log.info("Запрос на добавление дизлайка к отзыву c id = {} от пользователя с id = {}", reviewId, userId);
         reviewService.addDislikeToReview(reviewId, userId);

@@ -37,7 +37,6 @@ public class UserController {
     }
 
     @GetMapping("/{id}/recommendations")
-    @ResponseStatus(HttpStatus.OK)
     public Collection<Film> getRecommendationsForUser(@PathVariable("id") @Positive Long userId) {
         return userService.getRecommendationsForUser(userId);
     }
@@ -56,7 +55,6 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    @ResponseStatus(HttpStatus.CREATED)
     public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
         userService.addFriend(id, friendId);
     }
