@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.model.SearchBy;
+import ru.yandex.practicum.filmorate.model.SortedBy;
 import ru.yandex.practicum.filmorate.storage.director.DbDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
@@ -127,18 +128,19 @@ public class FilmService {
         return mpaStorage.getById(id);
     }
 
-    public List<Film> getFilmsByDirectorIdSortedByLikes(Long directorId) {
+    public List<Film> getFilmsByDirectorId(SortedBy sortedBy, Long directorId) {
         if (directorStorage.getById(directorId) == null) {
             throw new NotFoundException("Режиссер с id " + directorId + " не найден");
         }
-        return filmStorage.getFilmsByDirectorIdSortedByLikes(directorId);
-    }
-
-    public List<Film> getFilmsByDirectorIdSortedByYear(Long directorId) {
-        if (directorStorage.getById(directorId) == null) {
-            throw new NotFoundException("Режиссер с id " + directorId + " не найден");
+        switch (sortedBy) {
+            case Likes -> {
+                return filmStorage.getFilmsByDirectorIdSortedByLikes(directorId);
+            }
+            case Years -> {
+                return filmStorage.getFilmsByDirectorIdSortedByYear(directorId);
+            }
         }
-        return filmStorage.getFilmsByDirectorIdSortedByYear(directorId);
+        throw new ValidationException("Ошибка переменной сортировки");
     }
 
     public void deleteFilm(Long id) {

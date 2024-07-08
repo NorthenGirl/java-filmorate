@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.SearchBy;
+import ru.yandex.practicum.filmorate.model.SortedBy;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.ArrayList;
@@ -104,13 +105,12 @@ public class FilmController {
 
     @GetMapping("/director/{directorId}")
     public List<Film> getFilmsByDirector(@PathVariable Long directorId, @RequestParam(value = "sortBy") String sortBy) {
-        List<Film> films = new ArrayList<>();
         if ("likes".equals(sortBy)) {
-            films = filmService.getFilmsByDirectorIdSortedByLikes(directorId);
+            return filmService.getFilmsByDirectorId(SortedBy.Likes, directorId);
         } else if ("year".equals(sortBy)) {
-            films = filmService.getFilmsByDirectorIdSortedByYear(directorId);
+            return filmService.getFilmsByDirectorId(SortedBy.Years, directorId);
         }
-        return films;
+        throw new ValidationException("Ошибка переменной сортирования");
     }
 
     @DeleteMapping("/{id}")
