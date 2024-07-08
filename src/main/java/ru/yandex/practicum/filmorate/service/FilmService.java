@@ -8,21 +8,21 @@ import ru.yandex.practicum.filmorate.model.EventOperation;
 import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.GenreEnum;
 import ru.yandex.practicum.filmorate.model.MPA;
 import ru.yandex.practicum.filmorate.model.SearchBy;
 import ru.yandex.practicum.filmorate.model.SortedBy;
 import ru.yandex.practicum.filmorate.storage.director.DbDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.likes.LikesStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,15 +47,11 @@ public class FilmService {
     public Film create(Film film) {
         mpaStorage.mpaValidateBadRequest(film.getMpa().getId());
         film.getMpa().setName(mpaStorage.getById(film.getMpa().getId()).getName());
-        if (!film.getGenres().isEmpty()) {
-            genreStorage.genreValidate(film.getGenres());
-            film.getGenres().stream()
-                    .forEach(genre -> genre.setName(genreStorage.getById(genre.getId()).getName()));
-        }
+        setGenreToFilm(film);
+
         if (!film.getDirectors().isEmpty()) {
             directorStorage.directorValidate(film.getDirectors());
-            film.getDirectors().stream()
-                    .forEach(director -> director.setName(directorStorage.getById(director.getId()).getName()));
+            film.getDirectors().forEach(director -> director.setName(directorStorage.getById(director.getId()).getName()));
         }
         return filmStorage.create(film);
     }
@@ -63,22 +59,29 @@ public class FilmService {
     public Film update(Film film) {
         mpaStorage.mpaValidateNotFound(film.getMpa().getId());
         film.getMpa().setName(mpaStorage.getById(film.getMpa().getId()).getName());
-        if (!film.getGenres().isEmpty()) {
-            genreStorage.genreValidate(film.getGenres());
-            Set<Long> ids = film.getGenres().stream().map(Genre::getId).collect(Collectors.toSet());
-            ArrayList<Genre> genres = new ArrayList<>();
-            ids.stream()
-                    .forEach(id -> genres.add(genreStorage.getById(id)));
-            film.setGenres(genres);
-        }
+        setGenreToFilm(film);
 
         if (!film.getDirectors().isEmpty()) {
             directorStorage.directorValidate(film.getDirectors());
-            film.getDirectors().stream()
+            film.getDirectors()
                     .forEach(director -> director.setName(directorStorage.getById(director.getId()).getName()));
         }
-
         return filmStorage.update(film);
+    }
+
+    private void setGenreToFilm(Film film) {
+        if (!film.getGenres().isEmpty()) {
+            Set<Long> genreIds = new HashSet<>();
+            film.getGenres().forEach(g -> genreIds.add(g.getId()));
+            List<Genre> genres = genreIds
+                    .stream()
+                    .map(id -> Genre.builder()
+                            .id(id)
+                            .name(GenreEnum.getNameByDBId(id))
+                            .build())
+                    .toList();
+            film.setGenres(genres);
+        }
     }
 
     public Film getFilm(Long id) {
