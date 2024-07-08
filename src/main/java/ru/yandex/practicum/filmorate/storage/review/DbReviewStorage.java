@@ -18,6 +18,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DbReviewStorage implements ReviewStorage {
     private final JdbcTemplate jdbcTemplate;
+    private final ReviewRatingMapper reviewRatingMapper;
+    private final ReviewMapper reviewMapper;
 
     @Override
     public Review create(Review review) {
@@ -75,7 +77,7 @@ public class DbReviewStorage implements ReviewStorage {
                 WHERE id = ?
                 """;
 
-        return jdbcTemplate.query(sqlQuery, new ReviewMapper(), id).stream().findFirst();
+        return jdbcTemplate.query(sqlQuery, reviewMapper, id).stream().findFirst();
     }
 
     @Override
@@ -86,7 +88,7 @@ public class DbReviewStorage implements ReviewStorage {
                 ORDER BY useful DESC
                 """;
 
-        return jdbcTemplate.query(sqlQuery, new ReviewMapper());
+        return jdbcTemplate.query(sqlQuery, reviewMapper);
     }
 
     @Override
@@ -99,7 +101,7 @@ public class DbReviewStorage implements ReviewStorage {
                 LIMIT ?
                 """;
 
-        return jdbcTemplate.query(sqlQuery, new ReviewMapper(), filmId, count);
+        return jdbcTemplate.query(sqlQuery, reviewMapper, filmId, count);
     }
 
     @Override
@@ -163,6 +165,6 @@ public class DbReviewStorage implements ReviewStorage {
                 WHERE review_id = ?
                 """;
 
-        return jdbcTemplate.query(sqlQuery, new ReviewRatingMapper(), reviewId).stream().findAny().orElseThrow(null);
+        return jdbcTemplate.query(sqlQuery, reviewRatingMapper, reviewId).stream().findAny().orElseThrow(null);
     }
 }

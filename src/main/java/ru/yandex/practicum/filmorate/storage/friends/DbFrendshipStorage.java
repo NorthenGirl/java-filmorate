@@ -14,11 +14,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DbFrendshipStorage implements FriendshipStorage {
     private final JdbcTemplate jdbcTemplate;
+    private final DataClassRowMapper<Friendship> dataClassRowMapper=new DataClassRowMapper<>(Friendship.class);
 
     @Override
     public Friendship getById(Long id) {
         String sqlQuery = "SELECT * FROM friendship_status WHERE status_id = ?";
-        final List<Friendship> friendshipStatus = jdbcTemplate.query(sqlQuery, new DataClassRowMapper<>(Friendship.class), id);
+        final List<Friendship> friendshipStatus = jdbcTemplate.query(sqlQuery, dataClassRowMapper, id);
         if (CollectionUtils.isEmpty(friendshipStatus)) {
             throw new NotFoundException("Статуса дружбы с id = " + id + " не существует");
         }
@@ -28,6 +29,6 @@ public class DbFrendshipStorage implements FriendshipStorage {
     @Override
     public List<Friendship> getAll() {
         String sqlQuery = "SELECT * FROM friendship_status";
-        return jdbcTemplate.query(sqlQuery, new DataClassRowMapper<>(Friendship.class));
+        return jdbcTemplate.query(sqlQuery, dataClassRowMapper);
     }
 }

@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.director;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -64,7 +63,7 @@ public class DbDirectorStorage implements DirectorStorage {
     public Director getById(Long id) {
         try {
             String sqlQery = "SELECT * FROM directors WHERE id = ?";
-            return jdbcTemplate.queryForObject(sqlQery, directorMapper::mapRow, id);
+            return jdbcTemplate.queryForObject(sqlQery, directorMapper, id);
         } catch (EmptyResultDataAccessException exception) {
             throw new NotFoundException("Режиссера с id: " + id + " не существует");
         }
@@ -73,14 +72,14 @@ public class DbDirectorStorage implements DirectorStorage {
     @Override
     public List<Director> getAll() {
         String sqlQuery = "SELECT * FROM directors";
-        List<Director> directors = jdbcTemplate.query(sqlQuery, directorMapper::mapRow);
+        List<Director> directors = jdbcTemplate.query(sqlQuery, directorMapper);
         return directors;
     }
 
     @Override
     public void directorValidate(List<Director> directors) {
         for (Director director : directors) {
-            if ((jdbcTemplate.query("SELECT * FROM directors WHERE id = ?", new DataClassRowMapper<>(Director.class), director.getId())).isEmpty()) {
+            if ((jdbcTemplate.query("SELECT * FROM directors WHERE id = ?", directorMapper, director.getId())).isEmpty()) {
                 throw new ValidationException("Режиссера с id: " + director.getId() + " не существует");
             }
         }

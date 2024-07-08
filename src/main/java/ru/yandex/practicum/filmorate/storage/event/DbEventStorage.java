@@ -12,6 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DbEventStorage implements EventStorage {
     private final JdbcTemplate jdbcTemplate;
+    private final EventMapper eventMapper;
 
     @Override
     public List<Event> getFeed(long userId) {
@@ -21,7 +22,7 @@ public class DbEventStorage implements EventStorage {
                 WHERE user_id = ?
                 """;
 
-        return jdbcTemplate.query(sqlQuery, new EventMapper(), userId);
+        return jdbcTemplate.query(sqlQuery, eventMapper, userId);
     }
 
     @Override
