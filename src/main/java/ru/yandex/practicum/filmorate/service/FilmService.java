@@ -3,11 +3,13 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.EventOperation;
 import ru.yandex.practicum.filmorate.model.EventType;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.model.SearchBy;
 import ru.yandex.practicum.filmorate.storage.director.DbDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
@@ -147,15 +149,18 @@ public class FilmService {
         filmStorage.delete(id);
     }
 
-    public List<Film> getFilmsByTitle(String query) {
-        return filmStorage.getFilmsByTitle(query);
-    }
-
-    public List<Film> getFilmsByDirector(String query) {
-        return filmStorage.getFilmsByDirector(query);
-    }
-
-    public List<Film> getFilmsByDirectorAndTitle(String query) {
-        return filmStorage.getFilmsByDirectorAndTitle(query);
+    public List<Film> searchFilms(SearchBy by, String query) {
+        switch (by) {
+            case Title -> {
+                return filmStorage.getFilmsByTitle(query);
+            }
+            case Director -> {
+                return filmStorage.getFilmsByDirector(query);
+            }
+            case DirectorAndTitle -> {
+                return filmStorage.getFilmsByDirectorAndTitle(query);
+            }
+            default -> throw new ValidationException("Ошибка дополнительных параметров");
+        }
     }
 }
