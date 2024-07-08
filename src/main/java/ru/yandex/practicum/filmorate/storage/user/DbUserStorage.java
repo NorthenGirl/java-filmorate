@@ -84,7 +84,12 @@ public class DbUserStorage implements UserStorage {
         if (user.getId() == null) {
             throw new NotFoundException("Id пользователя должен быть указан");
         }
-        final String sqlQuery = "SELECT u.ID,\n" + "u.EMAIL,\n" + "u.LOGIN,\n" + "u.NAME,\n" + "u.BIRTHDAY,\n" + "f.USER2_ID\n" + "FROM  USERS AS u\n" + "LEFT JOIN FRIENDS AS f ON u.ID = f.USER1_ID\n" + "WHERE u.ID = ?";
+        final String sqlQuery = """
+                SELECT u.ID, u.EMAIL, u.LOGIN, u.NAME,u.BIRTHDAY,f.USER2_ID
+                FROM  USERS AS u
+                LEFT JOIN FRIENDS AS f ON u.ID = f.USER1_ID
+                WHERE u.ID = ?;
+                """;
         final List<User> users = jdbcTemplate.query(sqlQuery, multyUserMapper, user.getId());
         if (users.size() != 1) {
             throw new NotFoundException("Пользователь с  id = " + user.getId() + " не найден");
