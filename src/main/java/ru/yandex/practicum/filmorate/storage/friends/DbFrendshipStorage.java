@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DbFrendshipStorage implements FriendshipStorage {
     private final JdbcTemplate jdbcTemplate;
-    private final DataClassRowMapper<Friendship> dataClassRowMapper=new DataClassRowMapper<>(Friendship.class);
+    private final DataClassRowMapper<Friendship> dataClassRowMapper = new DataClassRowMapper<>(Friendship.class);
 
     @Override
     public Friendship getById(Long id) {

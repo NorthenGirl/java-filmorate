@@ -12,7 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DbFriendsStorage implements FriendsStorage {
     private final JdbcTemplate jdbcTemplate;
-    private final DataClassRowMapper<User> dataClassRowMapper=new DataClassRowMapper<>(User.class);
+    private final DataClassRowMapper<User> dataClassRowMapper = new DataClassRowMapper<>(User.class);
 
 
     @Override
