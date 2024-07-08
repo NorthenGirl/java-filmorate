@@ -6,8 +6,6 @@ import ru.yandex.practicum.filmorate.model.Director;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class DirectorMapper implements RowMapper<Director> {
