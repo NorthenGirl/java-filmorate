@@ -6,7 +6,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.mapper.UserMapper;
+import ru.yandex.practicum.filmorate.mapper.MultyUserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
@@ -17,12 +17,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DbUserStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
-    private final UserMapper userMapper;
+    private final MultyUserMapper multyUserMapper;
 
     @Override
     public List<User> findAll() {
-        String sqlQuery = "SELECT " + "u.ID, " + "u.EMAIL, " + "u.LOGIN, " + "u.NAME, " + "u.BIRTHDAY, " + "f.USER2_ID " + "FROM USERS u " + "LEFT JOIN FRIENDS f ON (f.USER1_ID  = u.ID)";
-        return jdbcTemplate.query(sqlQuery, userMapper::mapRow);
+        String sqlQuery = """
+                SELECT u.ID,u.EMAIL,u.LOGIN,u.NAME,u.BIRTHDAY,f.USER2_ID
+                FROM USERS u
+                LEFT JOIN FRIENDS f ON (f.USER1_ID  = u.ID);
+                """;
+        return jdbcTemplate.query(sqlQuery, multyUserMapper);
     }
 
     @Override
@@ -63,12 +67,17 @@ public class DbUserStorage implements UserStorage {
 
     @Override
     public User getUser(Long id) {
-        final String sqlQuery = "SELECT u.ID,\n" + "u.EMAIL,\n" + "u.LOGIN,\n" + "u.NAME,\n" + "u.BIRTHDAY,\n" + "f.USER2_ID\n" + "FROM  USERS AS u\n" + "LEFT JOIN FRIENDS AS f ON u.ID = f.USER1_ID\n" + "WHERE u.ID = ?";
-        final List<User> users = jdbcTemplate.query(sqlQuery, userMapper::mapRow, id);
-        if (users.size() == 0) {
+        final String sqlQuery = """
+                SELECT u.ID, u.EMAIL, u.LOGIN, u.NAME, u.BIRTHDAY, f.USER2_ID
+                FROM  USERS AS u
+                LEFT JOIN FRIENDS AS f ON u.ID = f.USER1_ID
+                WHERE u.ID = ?;
+                """;
+        final List<User> users = jdbcTemplate.query(sqlQuery, multyUserMapper, id);
+        if (users.isEmpty()) {
             throw new NotFoundException("Пользователь с  id = " + id + " не найден");
         }
-        return users.get(0);
+        return users.getFirst();
     }
 
     private void updateValidate(User user) {
@@ -76,7 +85,7 @@ public class DbUserStorage implements UserStorage {
             throw new NotFoundException("Id пользователя должен быть указан");
         }
         final String sqlQuery = "SELECT u.ID,\n" + "u.EMAIL,\n" + "u.LOGIN,\n" + "u.NAME,\n" + "u.BIRTHDAY,\n" + "f.USER2_ID\n" + "FROM  USERS AS u\n" + "LEFT JOIN FRIENDS AS f ON u.ID = f.USER1_ID\n" + "WHERE u.ID = ?";
-        final List<User> users = jdbcTemplate.query(sqlQuery, userMapper::mapRow, user.getId());
+        final List<User> users = jdbcTemplate.query(sqlQuery, multyUserMapper, user.getId());
         if (users.size() != 1) {
             throw new NotFoundException("Пользователь с  id = " + user.getId() + " не найден");
         }
