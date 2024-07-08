@@ -12,6 +12,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DbFriendsStorage implements FriendsStorage {
     private final JdbcTemplate jdbcTemplate;
+    private final DataClassRowMapper<User> dataClassRowMapper=new DataClassRowMapper<>(User.class);
 
 
     @Override
@@ -31,7 +32,7 @@ public class DbFriendsStorage implements FriendsStorage {
     public List<User> getFriends(Long userId) {
 
         String sqlQuery = "SELECT * FROM users WHERE id IN (SELECT user2_id FROM friends WHERE user1_id = ? AND status = 1)";
-        return jdbcTemplate.query(sqlQuery, new DataClassRowMapper<>(User.class), userId);
+        return jdbcTemplate.query(sqlQuery, dataClassRowMapper, userId);
     }
 
     @Override
@@ -48,6 +49,6 @@ public class DbFriendsStorage implements FriendsStorage {
                 "        WHERE user1_id = ? AND status = 1\n" +
                 "    )\n" +
                 ")";
-        return jdbcTemplate.query(sqlQuery, new DataClassRowMapper<>(User.class), userId, commonId);
+        return jdbcTemplate.query(sqlQuery, dataClassRowMapper, userId, commonId);
     }
 }

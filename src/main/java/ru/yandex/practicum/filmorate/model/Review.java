@@ -11,15 +11,15 @@ import lombok.Setter;
 @Builder
 public class Review {
     @NotNull(groups = {Update.class, Delete.class})
-    Long reviewId;
+    private Long reviewId;
     @NotNull
     @NotBlank
-    String content;
+    private String content;
     @NotNull
-    Boolean isPositive;
+    private Boolean isPositive;
     @NotNull
-    Long userId;
+    private Long userId;
     @NotNull
-    Long filmId;
-    Long useful;
+    private Long filmId;
+    private Long useful;
 }
