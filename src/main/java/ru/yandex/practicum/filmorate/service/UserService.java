@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.EventOperation;
@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService {
     private final UserStorage userStorage;
     private final FriendsStorage friendsStorage;
@@ -23,9 +23,7 @@ public class UserService {
     private final EventService eventService;
 
     public Collection<Film> getRecommendationsForUser(Long userId) {
-        if (userStorage.getUser(userId) == null) {
-            throw new NotFoundException("Пользователь с  id = " + userId + " не найден");
-        }
+        throwIfUserNotFound(userId);
         return filmStorage.getRecommendationsForUser(userId);
     }
 
@@ -45,41 +43,27 @@ public class UserService {
     }
 
     public void addFriend(Long userId, Long friendId) {
-        if (userStorage.getUser(userId) == null) {
-            throw new NotFoundException("Пользователь с  id = " + userId + " не найден");
-        }
-        if (userStorage.getUser(friendId) == null) {
-            throw new NotFoundException("Друг с  id = " + friendId + " не найден");
-        }
+        throwIfUserNotFound(userId);
+        throwIfUserNotFound(friendId);
         friendsStorage.addFriend(userId, friendId);
         eventService.createEvent(userId, EventType.FRIEND, EventOperation.ADD, friendId);
     }
 
     public void deleteFriend(Long userId, Long friendId) {
-        if (userStorage.getUser(userId) == null) {
-            throw new NotFoundException("Пользователь с  id = " + userId + " не найден");
-        }
-        if (userStorage.getUser(friendId) == null) {
-            throw new NotFoundException("У пользователя с id = " + userId + " не друга с  id = " + friendId);
-        }
+        throwIfUserNotFound(userId);
+        throwIfUserNotFound(friendId);
         friendsStorage.deleteFriend(userId, friendId);
         eventService.createEvent(userId, EventType.FRIEND, EventOperation.REMOVE, friendId);
     }
 
     public List<User> getFriends(Long userId) {
-        if (userStorage.getUser(userId) == null) {
-            throw new NotFoundException("Пользователь с  id = " + userId + " не найден");
-        }
+        throwIfUserNotFound(userId);
         return friendsStorage.getFriends(userId);
     }
 
     public List<User> getCommonFriends(Long userId, Long commonId) {
-        if (userStorage.getUser(userId) == null) {
-            throw new NotFoundException("Пользователь с  id = " + userId + " не найден");
-        }
-        if (userStorage.getUser(commonId) == null) {
-            throw new NotFoundException("Пользователь с  commonId = " + commonId + " не найден");
-        }
+        throwIfUserNotFound(userId);
+        throwIfUserNotFound(commonId);
         return friendsStorage.getIdCommonFriends(userId, commonId);
     }
 
@@ -89,5 +73,11 @@ public class UserService {
 
     public long deleteUser(long id) {
         return userStorage.delete(id);
+    }
+
+    private void throwIfUserNotFound(Long userId) {
+        if (userStorage.getUser(userId) == null) {
+            throw new NotFoundException("Пользователь с  id = " + userId + " не найден");
+        }
     }
 }

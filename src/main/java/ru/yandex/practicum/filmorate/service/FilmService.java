@@ -1,14 +1,20 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
-import ru.yandex.practicum.filmorate.model.*;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.EventOperation;
+import ru.yandex.practicum.filmorate.model.EventType;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.MPA;
+import ru.yandex.practicum.filmorate.model.SearchBy;
+import ru.yandex.practicum.filmorate.model.SortedBy;
 import ru.yandex.practicum.filmorate.storage.director.DbDirectorStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.genre_mpa.GenreStorage;
-import ru.yandex.practicum.filmorate.storage.genre_mpa.MpaStorage;
+import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
+import ru.yandex.practicum.filmorate.storage.mpa.MpaStorage;
 import ru.yandex.practicum.filmorate.storage.likes.LikesStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -19,7 +25,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-@Slf4j
 @RequiredArgsConstructor
 public class FilmService {
     private final FilmStorage filmStorage;
@@ -36,11 +41,7 @@ public class FilmService {
 
 
     public Collection<Film> findAll() {
-        Set<Long> ids = filmStorage.findAll().stream().map(Film::getId).collect(Collectors.toSet());
-        ArrayList<Film> films = new ArrayList<>();
-        ids.stream()
-                .forEach(id -> films.add(filmStorage.getFilm(id)));
-        return films;
+        return filmStorage.findAll();
     }
 
     public Film create(Film film) {
@@ -127,18 +128,19 @@ public class FilmService {
         return mpaStorage.getById(id);
     }
 
-    public List<Film> getFilmsByDirectorIdSortedByLikes(Long directorId) {
+    public List<Film> getFilmsByDirectorId(SortedBy sortedBy, Long directorId) {
         if (directorStorage.getById(directorId) == null) {
             throw new NotFoundException("Режиссер с id " + directorId + " не найден");
         }
-        return filmStorage.getFilmsByDirectorIdSortedByLikes(directorId);
-    }
-
-    public List<Film> getFilmsByDirectorIdSortedByYear(Long directorId) {
-        if (directorStorage.getById(directorId) == null) {
-            throw new NotFoundException("Режиссер с id " + directorId + " не найден");
+        switch (sortedBy) {
+            case Likes -> {
+                return filmStorage.getFilmsByDirectorIdSortedByLikes(directorId);
+            }
+            case Years -> {
+                return filmStorage.getFilmsByDirectorIdSortedByYear(directorId);
+            }
         }
-        return filmStorage.getFilmsByDirectorIdSortedByYear(directorId);
+        throw new ValidationException("Ошибка переменной сортировки");
     }
 
     public void deleteFilm(Long id) {
@@ -149,15 +151,18 @@ public class FilmService {
         filmStorage.delete(id);
     }
 
-    public List<Film> getFilmsByTitle(String query) {
-        return filmStorage.getFilmsByTitle(query);
-    }
-
-    public List<Film> getFilmsByDirector(String query) {
-        return filmStorage.getFilmsByDirector(query);
-    }
-
-    public List<Film> getFilmsByDirectorAndTitle(String query) {
-        return filmStorage.getFilmsByDirectorAndTitle(query);
+    public List<Film> searchFilms(SearchBy by, String query) {
+        switch (by) {
+            case Title -> {
+                return filmStorage.getFilmsByTitle(query);
+            }
+            case Director -> {
+                return filmStorage.getFilmsByDirector(query);
+            }
+            case DirectorAndTitle -> {
+                return filmStorage.getFilmsByDirectorAndTitle(query);
+            }
+            default -> throw new ValidationException("Ошибка дополнительных параметров");
+        }
     }
 }

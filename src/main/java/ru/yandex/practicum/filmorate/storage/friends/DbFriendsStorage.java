@@ -3,15 +3,16 @@ package ru.yandex.practicum.filmorate.storage.friends;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.DataClassRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
 
+@Repository
 @RequiredArgsConstructor
-@Component
 public class DbFriendsStorage implements FriendsStorage {
     private final JdbcTemplate jdbcTemplate;
+    private final DataClassRowMapper<User> dataClassRowMapper = new DataClassRowMapper<>(User.class);
 
 
     @Override
@@ -31,7 +32,7 @@ public class DbFriendsStorage implements FriendsStorage {
     public List<User> getFriends(Long userId) {
 
         String sqlQuery = "SELECT * FROM users WHERE id IN (SELECT user2_id FROM friends WHERE user1_id = ? AND status = 1)";
-        return jdbcTemplate.query(sqlQuery, new DataClassRowMapper<>(User.class), userId);
+        return jdbcTemplate.query(sqlQuery, dataClassRowMapper, userId);
     }
 
     @Override
@@ -48,6 +49,6 @@ public class DbFriendsStorage implements FriendsStorage {
                 "        WHERE user1_id = ? AND status = 1\n" +
                 "    )\n" +
                 ")";
-        return jdbcTemplate.query(sqlQuery, new DataClassRowMapper<>(User.class), userId, commonId);
+        return jdbcTemplate.query(sqlQuery, dataClassRowMapper, userId, commonId);
     }
 }

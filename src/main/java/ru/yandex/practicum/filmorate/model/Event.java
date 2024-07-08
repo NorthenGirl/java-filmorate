@@ -8,10 +8,10 @@ import lombok.Setter;
 @Setter
 @Builder
 public class Event {
-    long eventId;
-    long timestamp;
-    long userId;
-    EventType eventType;
-    EventOperation operation;
-    long entityId;
+    private Long eventId;
+    private Long timestamp;
+    private Long userId;
+    private EventType eventType;
+    private EventOperation operation;
+    private Long entityId;
 }
