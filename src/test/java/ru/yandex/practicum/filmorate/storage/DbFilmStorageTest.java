@@ -52,7 +52,7 @@ public class DbFilmStorageTest {
                 "description",
                 LocalDate.of(2024, 4, 17),
                 200,
-                new MPA(1L, "G")
+                MPA.builder().id(1L).name("G").build()
         ));
 
         Film film = filmStorage.getFilm(1L);
@@ -73,7 +73,7 @@ public class DbFilmStorageTest {
                 "new_description1",
                 LocalDate.of(2024, 4, 17),
                 90,
-                new MPA(3L, "PG"),
+                MPA.builder().id(3L).name("PG").build(),
                 new ArrayList<>(),
                 new ArrayList<>()
         ));
