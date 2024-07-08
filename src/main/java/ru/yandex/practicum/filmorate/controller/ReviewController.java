@@ -78,6 +78,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}/like/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteLikeToReview(@PathVariable("id") long reviewId, @PathVariable("userId") long userId) {
         log.info("Запрос на удаление лайка к отзыву c id = {} от пользователя с id = {}", reviewId, userId);
         reviewService.deleteLikeToReview(reviewId, userId);
@@ -85,6 +86,7 @@ public class ReviewController {
     }
 
     @DeleteMapping("/{id}/dislike/{userId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteDislikeToReview(@PathVariable("id") long reviewId, @PathVariable("userId") long userId) {
         log.info("Запрос на удаление дизлайка к отзыву c id = {} от пользователя с id = {}", reviewId, userId);
         reviewService.deleteDislikeToReview(reviewId, userId);
