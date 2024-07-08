@@ -17,7 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.SearchBy;
+import ru.yandex.practicum.filmorate.model.SortedBy;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.ArrayList;
@@ -86,30 +89,28 @@ public class FilmController {
     public List<Film> getFilmsByQuery(@RequestParam String query,
                                       @RequestParam Set<String> by) {
         query = "%" + query + "%";
-        List<Film> films = new ArrayList<Film>();
         if (by.size() < 2) {
             if (by.contains("title")) {
-                films = filmService.getFilmsByTitle(query);
+                return filmService.searchFilms(SearchBy.Title, query);
             }
             if (by.contains("director")) {
-                films = filmService.getFilmsByDirector(query);
+                return filmService.searchFilms(SearchBy.Director, query);
             }
         }
         if (by.size() == 2 && by.contains("director") && by.contains("title")) {
-            films = filmService.getFilmsByDirectorAndTitle(query);
+            return filmService.searchFilms(SearchBy.DirectorAndTitle, query);
         }
-        return films;
+        throw new ValidationException("Ошибка дополнительных параметров");
     }
 
     @GetMapping("/director/{directorId}")
     public List<Film> getFilmsByDirector(@PathVariable Long directorId, @RequestParam(value = "sortBy") String sortBy) {
-        List<Film> films = new ArrayList<>();
         if ("likes".equals(sortBy)) {
-            films = filmService.getFilmsByDirectorIdSortedByLikes(directorId);
+            return filmService.getFilmsByDirectorId(SortedBy.Likes, directorId);
         } else if ("year".equals(sortBy)) {
-            films = filmService.getFilmsByDirectorIdSortedByYear(directorId);
+            return filmService.getFilmsByDirectorId(SortedBy.Years, directorId);
         }
-        return films;
+        throw new ValidationException("Ошибка переменной сортирования");
     }
 
     @DeleteMapping("/{id}")
