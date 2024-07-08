@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class DbGenreStorage implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
-    private final DataClassRowMapper<Genre> dataClassRowMapper=new DataClassRowMapper<>(Genre.class);
+    private final DataClassRowMapper<Genre> dataClassRowMapper = new DataClassRowMapper<>(Genre.class);
 
     @Override
     public Genre getById(Long id) {
